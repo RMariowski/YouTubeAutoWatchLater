@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AZURE_FUNCTIONAPP_NAME: rm-yt-auto-watch-later
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
+  DOTNET_VERSION: '6.0.x'
+
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        run: dotnet build $PROJ_ROOT -c Release -o ./output
+
+      - name: Publish
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+         package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
