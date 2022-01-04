@@ -16,10 +16,7 @@ public static class YouTubeServiceExtensions
             subscriptionsListRequest.PageToken = nextPageToken;
             var subscriptionsListResponse = await subscriptionsListRequest.ExecuteAsync();
 
-            var subscriptions = subscriptionsListResponse.Items
-                .Select(YouTubeChannel.From)
-                .ToArray();
-
+            var subscriptions = subscriptionsListResponse.Items.Select(YouTubeChannel.From).ToArray();
             foreach (var subscription in subscriptions)
                 youTubeSubscriptions.Add(subscription.Id, subscription);
 
@@ -71,10 +68,9 @@ public static class YouTubeServiceExtensions
         return recentVideos;
     }
 
-    public static async Task AddToPlaylist(this YouTubeService youTubeService, string playlistId,
-        YouTubeVideo video)
+    public static async Task AddToPlaylist(this YouTubeService youTubeService, string playlistId, YouTubeVideo video)
     {
-        var playlistItemsInsertRequest = youTubeService.PlaylistItems.Insert(new PlaylistItem
+        var playlistItem = new PlaylistItem
         {
             Snippet = new PlaylistItemSnippet
             {
@@ -86,7 +82,8 @@ public static class YouTubeServiceExtensions
                     Kind = video.Kind
                 }
             }
-        }, "snippet");
+        };
+        var playlistItemsInsertRequest = youTubeService.PlaylistItems.Insert(playlistItem, "snippet");
         await playlistItemsInsertRequest.ExecuteAsync();
     }
 }
