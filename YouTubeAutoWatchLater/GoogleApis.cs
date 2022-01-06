@@ -26,7 +26,10 @@ public class GoogleApis
         using HttpClient httpClient = new();
         var response = await httpClient.SendAsync(refreshMessage);
         if (response.IsSuccessStatusCode is false)
-            throw new ApplicationException("Failed to get access token.");
+        {
+            string reason = await response.Content.ReadAsStringAsync();
+            throw new ApplicationException($"Failed to get access token. Reason: {reason}");
+        }
 
         var contentStream = await response.Content.ReadAsStreamAsync();
         using StreamReader streamReader = new(contentStream);
