@@ -43,7 +43,11 @@ public class GoogleApis
 
     private static async Task<GoogleClientSecrets> GetClientSecrets()
     {
-        const string clientSecretsFilePath = "client_secrets.json";
+        string binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        string rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."))!;
+        const string clientSecretsFileName = "client_secrets.json";
+        var clientSecretsFilePath = $"{rootDirectory}/{clientSecretsFileName}";
+
         var googleClientSecrets = await GoogleClientSecrets.FromFileAsync(clientSecretsFilePath);
         if (googleClientSecrets is null)
             throw new ApplicationException($"{clientSecretsFilePath} file not found");
