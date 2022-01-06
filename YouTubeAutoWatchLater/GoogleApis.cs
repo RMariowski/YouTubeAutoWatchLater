@@ -12,12 +12,13 @@ public class GoogleApis
 {
     public static async Task<string> GetAccessToken()
     {
+        var clientSecrets = await GetClientSecrets();
         var refreshMessage = new HttpRequestMessage(HttpMethod.Post, "https://www.googleapis.com/oauth2/v4/token")
         {
             Content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
             {
-                new("client_id", Environment.GetEnvironmentVariable("YouTube:ClientId")!),
-                new("client_secret", Environment.GetEnvironmentVariable("YouTube:ClientSecret")!),
+                new("client_id", clientSecrets.Secrets.ClientId),
+                new("client_secret", clientSecrets.Secrets.ClientSecret),
                 new("refresh_token", Environment.GetEnvironmentVariable("YouTube:RefreshToken")!),
                 new("grant_type", "refresh_token")
             })
@@ -38,6 +39,15 @@ public class GoogleApis
 
         var tokenResponse = serializer.Deserialize<TokenResponse>(jsonReader);
         return tokenResponse!.AccessToken;
+    }
+
+    private static async Task<GoogleClientSecrets> GetClientSecrets()
+    {
+        const string clientSecretsFilePath = "client_secrets.json";
+        var googleClientSecrets = await GoogleClientSecrets.FromFileAsync(clientSecretsFilePath);
+        if (googleClientSecrets is null)
+            throw new ApplicationException($"{clientSecretsFilePath} file not found");
+        return googleClientSecrets;
     }
 
     public static YouTubeService CreateYouTubeService(string accessToken)
