@@ -37,9 +37,7 @@ public class YouTubeAutoWatchLater
         await SetRecentVideosForSubscriptions(subscriptions, newerThan);
         log.LogInformation("Finished setting recent videos of subscriptions");
 
-        log.LogInformation("Adding recent videos to playlist...");
         await AddRecentVideosToPlaylist(subscriptions);
-        log.LogInformation("Finished adding recent videos to playlist");
     }
 
     private async Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions)
@@ -84,11 +82,21 @@ public class YouTubeAutoWatchLater
             .OrderByDescending(video => video.PublishedAt)
             .ToArray();
 
+        if (recentVideos.Length == 0)
+        {
+            _logger.LogInformation("No videos to add");
+            return;
+        }
+
+        _logger.LogInformation("Adding recent videos to playlist...");
+
         foreach (var video in recentVideos)
         {
             _logger.LogInformation($"Adding video {video} to playlist");
             await _youTubeService!.AddToPlaylist(playlistId, video);
             _logger.LogInformation($"Finished adding video {video} to playlist");
         }
+
+        _logger.LogInformation("Finished adding recent videos to playlist");
     }
 }
