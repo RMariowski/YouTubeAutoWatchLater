@@ -7,35 +7,38 @@ public class YouTubeAutoWatchLater
 {
     public const int MaxResults = 50;
 
-    private ILogger? _logger;
+    private readonly ILogger<YouTubeAutoWatchLater> _logger;
     private YouTubeService? _youTubeService;
+
+    public YouTubeAutoWatchLater(ILogger<YouTubeAutoWatchLater> logger)
+    {
+        _logger = logger;
+    }
 
     [Singleton]
     [FunctionName(nameof(Run))]
-    public async Task Run([TimerTrigger("%Cron%", RunOnStartup = true)] TimerInfo timerInfo, ILogger log)
+    public async Task Run([TimerTrigger("%Cron%", RunOnStartup = true)] TimerInfo timerInfo)
     {
-        _logger = log;
-
-        log.LogInformation("Getting access token...");
+        _logger.LogInformation("Getting access token...");
         string accessToken = await GoogleApis.GetAccessToken();
-        log.LogInformation("Finished getting access token");
+        _logger.LogInformation("Finished getting access token");
 
-        log.LogInformation("Creating YouTube service...");
+        _logger.LogInformation("Creating YouTube service...");
         _youTubeService = GoogleApis.CreateYouTubeService(accessToken);
-        log.LogInformation("Finished creating YouTube service");
+        _logger.LogInformation("Finished creating YouTube service");
 
-        log.LogInformation("Getting subscriptions...");
+        _logger.LogInformation("Getting subscriptions...");
         var subscriptions = await _youTubeService.GetMySubscriptions();
-        log.LogInformation("Finished getting subscriptions");
+        _logger.LogInformation("Finished getting subscriptions");
 
-        log.LogInformation("Setting uploads playlist for subscriptions");
+        _logger.LogInformation("Setting uploads playlist for subscriptions");
         await SetUploadsPlaylistForSubscriptions(subscriptions);
-        log.LogInformation("Finished setting uploads playlist of subscriptions");
+        _logger.LogInformation("Finished setting uploads playlist of subscriptions");
 
-        log.LogInformation("Setting recent videos of subscriptions...");
+        _logger.LogInformation("Setting recent videos of subscriptions...");
         var newerThan = timerInfo.ScheduleStatus.Last == default ? DateTime.UtcNow : timerInfo.ScheduleStatus.Last;
         await SetRecentVideosForSubscriptions(subscriptions, newerThan);
-        log.LogInformation("Finished setting recent videos of subscriptions");
+        _logger.LogInformation("Finished setting recent videos of subscriptions");
 
         await AddRecentVideosToPlaylist(subscriptions);
     }
