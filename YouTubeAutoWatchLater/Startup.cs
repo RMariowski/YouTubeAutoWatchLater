@@ -10,6 +10,7 @@ public class Startup : FunctionsStartup
     public override void Configure(IFunctionsHostBuilder builder)
     {
         builder.Services
+            .AddLogging()
             .AddHttpClient()
             .AddSingleton<ISettings, Settings>()
             .AddSingleton<IGoogleApis, GoogleApis>();
