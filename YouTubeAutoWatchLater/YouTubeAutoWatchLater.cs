@@ -19,7 +19,13 @@ public class YouTubeAutoWatchLater
 
     [Singleton]
     [FunctionName(nameof(Run))]
-    public async Task Run([TimerTrigger("%Cron%", RunOnStartup = true)] TimerInfo timerInfo)
+    public async Task Run(
+        [TimerTrigger("%Cron%"
+#if DEBUG
+            , RunOnStartup = true
+#endif
+        )]
+        TimerInfo timerInfo)
     {
         _logger.LogInformation("Getting access token...");
         string accessToken = await _googleApis.GetAccessToken();
