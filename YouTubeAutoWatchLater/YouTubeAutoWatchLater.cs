@@ -7,11 +7,13 @@ public class YouTubeAutoWatchLater
 {
     public const int MaxResults = 50;
 
+    private readonly IGoogleApis _googleApis;
     private readonly ILogger<YouTubeAutoWatchLater> _logger;
     private YouTubeService? _youTubeService;
 
-    public YouTubeAutoWatchLater(ILogger<YouTubeAutoWatchLater> logger)
+    public YouTubeAutoWatchLater(IGoogleApis googleApis, ILogger<YouTubeAutoWatchLater> logger)
     {
+        _googleApis = googleApis;
         _logger = logger;
     }
 
@@ -20,11 +22,11 @@ public class YouTubeAutoWatchLater
     public async Task Run([TimerTrigger("%Cron%", RunOnStartup = true)] TimerInfo timerInfo)
     {
         _logger.LogInformation("Getting access token...");
-        string accessToken = await GoogleApis.GetAccessToken();
+        string accessToken = await _googleApis.GetAccessToken();
         _logger.LogInformation("Finished getting access token");
 
         _logger.LogInformation("Creating YouTube service...");
-        _youTubeService = GoogleApis.CreateYouTubeService(accessToken);
+        _youTubeService = _googleApis.CreateYouTubeService(accessToken);
         _logger.LogInformation("Finished creating YouTube service");
 
         _logger.LogInformation("Getting subscriptions...");
