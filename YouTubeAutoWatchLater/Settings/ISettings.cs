@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater;
+﻿namespace YouTubeAutoWatchLater.Settings;
 
 public interface ISettings
 {

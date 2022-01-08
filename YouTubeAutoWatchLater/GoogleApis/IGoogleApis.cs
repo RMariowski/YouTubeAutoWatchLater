@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater;
+﻿namespace YouTubeAutoWatchLater.GoogleApis;
 
 public interface IGoogleApis
 {

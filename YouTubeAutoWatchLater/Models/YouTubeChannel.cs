@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater;
+﻿namespace YouTubeAutoWatchLater.Models;
 
 public record YouTubeChannel(string Id, string Name)
 {

@@ -1,4 +1,6 @@
-﻿namespace YouTubeAutoWatchLater;
+﻿using YouTubeAutoWatchLater.Models;
+
+namespace YouTubeAutoWatchLater.Extensions;
 
 public static class YouTubeServiceExtensions
 {

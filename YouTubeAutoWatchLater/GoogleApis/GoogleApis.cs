@@ -6,9 +6,10 @@ using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using YouTubeAutoWatchLater.Settings;
 using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 
-namespace YouTubeAutoWatchLater;
+namespace YouTubeAutoWatchLater.GoogleApis;
 
 public class GoogleApis : IGoogleApis
 {

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using YouTubeAutoWatchLater.GoogleApis;
+using YouTubeAutoWatchLater.Settings;
 
 [assembly: FunctionsStartup(typeof(YouTubeAutoWatchLater.Startup))]
 
@@ -12,7 +14,7 @@ public class Startup : FunctionsStartup
         builder.Services
             .AddLogging()
             .AddHttpClient()
-            .AddSingleton<ISettings, Settings>()
-            .AddSingleton<IGoogleApis, GoogleApis>();
+            .AddSingleton<ISettings, Settings.Settings>()
+            .AddSingleton<IGoogleApis, GoogleApis.GoogleApis>();
     }
 }
