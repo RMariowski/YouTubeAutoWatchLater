@@ -2,12 +2,30 @@
 
 public class Settings : ISettings
 {
-    public string GetRefreshToken()
+    public string RefreshToken { get; }
+    public string PlaylistId { get; }
+
+    public Settings()
     {
-        const string refreshTokenSettingKey = "YouTube:RefreshToken";
-        string? refreshToken = Environment.GetEnvironmentVariable(refreshTokenSettingKey);
+        RefreshToken = GetRefreshToken();
+        PlaylistId = GetPlaylistId();
+    }
+
+    private static string GetRefreshToken()
+    {
+        const string settingKey = "YouTube:RefreshToken";
+        string? refreshToken = Environment.GetEnvironmentVariable(settingKey);
         if (string.IsNullOrWhiteSpace(refreshToken))
-            throw new ApplicationException($"Missing setting value of {refreshTokenSettingKey}");
+            throw new ApplicationException($"Missing setting value of {settingKey}");
         return refreshToken;
+    }
+
+    private static string GetPlaylistId()
+    {
+        const string settingKey = "YouTube:PlaylistId";
+        string? playlistId = Environment.GetEnvironmentVariable(settingKey);
+        if (string.IsNullOrWhiteSpace(playlistId))
+            throw new ApplicationException($"Missing setting value of {settingKey}");
+        return playlistId;
     }
 }

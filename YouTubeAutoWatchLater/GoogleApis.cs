@@ -36,7 +36,7 @@ public class GoogleApis : IGoogleApis
             {
                 new("client_id", secrets.ClientId),
                 new("client_secret", secrets.ClientSecret),
-                new("refresh_token", _settings.GetRefreshToken()),
+                new("refresh_token", _settings.RefreshToken),
                 new("grant_type", "refresh_token")
             })
         };

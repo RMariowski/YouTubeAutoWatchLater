@@ -2,5 +2,6 @@
 
 public interface ISettings
 {
-    string GetRefreshToken();
+    string RefreshToken { get; }
+    string PlaylistId { get; }
 }

@@ -8,12 +8,14 @@ public class YouTubeAutoWatchLater
     public const int MaxResults = 50;
 
     private readonly IGoogleApis _googleApis;
+    private readonly ISettings _settings;
     private readonly ILogger<YouTubeAutoWatchLater> _logger;
     private YouTubeService? _youTubeService;
 
-    public YouTubeAutoWatchLater(IGoogleApis googleApis, ILogger<YouTubeAutoWatchLater> logger)
+    public YouTubeAutoWatchLater(IGoogleApis googleApis, ISettings settings, ILogger<YouTubeAutoWatchLater> logger)
     {
         _googleApis = googleApis;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -86,8 +88,6 @@ public class YouTubeAutoWatchLater
 
     private async Task AddRecentVideosToPlaylist(Subscriptions subscriptions)
     {
-        string playlistId = Environment.GetEnvironmentVariable("YouTube:PlaylistId")!;
-
         var recentVideos = subscriptions.Values
             .SelectMany(subscription => subscription.RecentVideos!)
             .OrderByDescending(video => video.PublishedAt)
@@ -104,7 +104,7 @@ public class YouTubeAutoWatchLater
         foreach (var video in recentVideos)
         {
             _logger.LogInformation($"Adding video {video} to playlist");
-            await _youTubeService!.AddToPlaylist(playlistId, video);
+            await _youTubeService!.AddToPlaylist(_settings.PlaylistId, video);
             _logger.LogInformation($"Finished adding video {video} to playlist");
         }
 
