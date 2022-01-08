@@ -27,7 +27,7 @@ public class YouTubeAutoWatchLater
     {
         _logger.LogInformation("Initializing YouTube service...");
         await _youTubeService.Init();
-        _logger.LogInformation("Finished creating YouTube service");
+        _logger.LogInformation("Finished initializing YouTube service");
 
         _logger.LogInformation("Getting subscriptions...");
         var subscriptions = await _youTubeService.GetMySubscriptions();

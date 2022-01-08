@@ -28,9 +28,9 @@ public class YouTubeService : IYouTubeService
         string accessToken = await _googleApis.GetAccessToken();
         _logger.LogInformation("Finished getting access token");
 
-        _logger.LogInformation("Creating YouTube service...");
+        _logger.LogInformation("Creating YouTube API...");
         _youTubeApi = _googleApis.CreateYouTubeService(accessToken);
-        _logger.LogInformation("Finished creating YouTube service");
+        _logger.LogInformation("Finished creating YouTube API");
     }
 
     public async Task<Subscriptions> GetMySubscriptions()
