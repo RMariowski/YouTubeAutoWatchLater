@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using YouTubeAutoWatchLater.GoogleApis;
 using YouTubeAutoWatchLater.Settings;
+using YouTubeAutoWatchLater.YouTube;
 
 [assembly: FunctionsStartup(typeof(YouTubeAutoWatchLater.Startup))]
 
@@ -15,6 +16,7 @@ public class Startup : FunctionsStartup
             .AddLogging()
             .AddHttpClient()
             .AddSingleton<ISettings, Settings.Settings>()
-            .AddSingleton<IGoogleApis, GoogleApis.GoogleApis>();
+            .AddSingleton<IGoogleApis, GoogleApis.GoogleApis>()
+            .AddSingleton<IYouTubeService, YouTube.YouTubeService>();
     }
 }

@@ -4,41 +4,17 @@ namespace YouTubeAutoWatchLater.Extensions;
 
 public static class YouTubeServiceExtensions
 {
-    public static async Task<Dictionary<string, YouTubeChannel>> GetMySubscriptions(
-        this YouTubeService youTubeService)
-    {
-        Dictionary<string, YouTubeChannel> youTubeSubscriptions = new();
-
-        var nextPageToken = string.Empty;
-        do
-        {
-            var subscriptionsListRequest = youTubeService.Subscriptions.List("snippet");
-            subscriptionsListRequest.MaxResults = YouTubeAutoWatchLater.MaxResults;
-            subscriptionsListRequest.Mine = true;
-            subscriptionsListRequest.PageToken = nextPageToken;
-            var subscriptionsListResponse = await subscriptionsListRequest.ExecuteAsync();
-
-            var subscriptions = subscriptionsListResponse.Items.Select(YouTubeChannel.From).ToArray();
-            foreach (var subscription in subscriptions)
-                youTubeSubscriptions.Add(subscription.Id, subscription);
-
-            nextPageToken = subscriptionsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(nextPageToken));
-
-        return youTubeSubscriptions;
-    }
-
-    public static async Task<IList<Channel>> GetChannelsOfSubscriptions(this YouTubeService youTubeService,
+    public static async Task<IList<Channel>> GetChannelsOfSubscriptions(this YouTubeApi youTubeApi,
         KeyValuePair<string, YouTubeChannel>[] subscriptions)
     {
-        var channelsListRequest = youTubeService.Channels.List("contentDetails");
+        var channelsListRequest = youTubeApi.Channels.List("contentDetails");
         channelsListRequest.Id = subscriptions.Select(subscription => subscription.Key).ToArray();
         channelsListRequest.MaxResults = subscriptions.Length;
         var channelListResponse = await channelsListRequest.ExecuteAsync();
         return channelListResponse.Items;
     }
 
-    public static async Task<IList<YouTubeVideo>> GetRecentVideos(this YouTubeService youTubeService,
+    public static async Task<IList<YouTubeVideo>> GetRecentVideos(this YouTubeApi youTubeApi,
         string playlistId, DateTime dateTime)
     {
         const int fetchCount = 5;
@@ -48,7 +24,7 @@ public static class YouTubeServiceExtensions
         string nextPageToken;
         do
         {
-            var playlistItemsListRequest = youTubeService.PlaylistItems.List("snippet");
+            var playlistItemsListRequest = youTubeApi.PlaylistItems.List("snippet");
             playlistItemsListRequest.PlaylistId = playlistId;
             playlistItemsListRequest.MaxResults = fetchCount;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
@@ -70,7 +46,7 @@ public static class YouTubeServiceExtensions
         return recentVideos;
     }
 
-    public static async Task AddToPlaylist(this YouTubeService youTubeService, string playlistId, YouTubeVideo video)
+    public static async Task AddToPlaylist(this YouTubeApi youTubeApi, string playlistId, YouTubeVideo video)
     {
         var playlistItem = new PlaylistItem
         {
@@ -85,7 +61,7 @@ public static class YouTubeServiceExtensions
                 }
             }
         };
-        var playlistItemsInsertRequest = youTubeService.PlaylistItems.Insert(playlistItem, "snippet");
+        var playlistItemsInsertRequest = youTubeApi.PlaylistItems.Insert(playlistItem, "snippet");
         await playlistItemsInsertRequest.ExecuteAsync();
     }
 }
