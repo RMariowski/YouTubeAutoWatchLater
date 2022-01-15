@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Azure.Data.Tables" Version="12.3.0" />
         <PackageReference Include="Google.Apis.YouTube.v3" Version="1.55.0.2449" />
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />

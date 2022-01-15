@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using YouTubeAutoWatchLater.GoogleApis;
+using YouTubeAutoWatchLater.Repositories;
 using YouTubeAutoWatchLater.Settings;
 using YouTubeAutoWatchLater.YouTube;
 
@@ -17,6 +18,7 @@ public class Startup : FunctionsStartup
             .AddHttpClient()
             .AddSingleton<ISettings, Settings.Settings>()
             .AddSingleton<IGoogleApis, GoogleApis.GoogleApis>()
-            .AddSingleton<IYouTubeService, YouTube.YouTubeService>();
+            .AddSingleton<IYouTubeService, YouTube.YouTubeService>()
+            .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>();
     }
 }

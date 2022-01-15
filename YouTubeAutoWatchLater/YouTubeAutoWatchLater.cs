@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Repositories;
 using YouTubeAutoWatchLater.YouTube;
 
 namespace YouTubeAutoWatchLater;
@@ -7,11 +8,14 @@ namespace YouTubeAutoWatchLater;
 public class YouTubeAutoWatchLater
 {
     private readonly IYouTubeService _youTubeService;
+    private readonly IConfigurationRepository _configurationRepository;
     private readonly ILogger<YouTubeAutoWatchLater> _logger;
 
-    public YouTubeAutoWatchLater(IYouTubeService youTubeService, ILogger<YouTubeAutoWatchLater> logger)
+    public YouTubeAutoWatchLater(IYouTubeService youTubeService, IConfigurationRepository configurationRepository,
+        ILogger<YouTubeAutoWatchLater> logger)
     {
         _youTubeService = youTubeService;
+        _configurationRepository = configurationRepository;
         _logger = logger;
     }
 
@@ -38,10 +42,12 @@ public class YouTubeAutoWatchLater
         _logger.LogInformation("Finished setting uploads playlist of subscriptions");
 
         _logger.LogInformation("Setting recent videos of subscriptions...");
-        var newerThan = timerInfo.ScheduleStatus.Last == default ? DateTime.UtcNow : timerInfo.ScheduleStatus.Last;
+        var newerThan = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
         await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, newerThan);
         _logger.LogInformation("Finished setting recent videos of subscriptions");
 
         await _youTubeService.AddRecentVideosToPlaylist(subscriptions);
+
+        await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
     }
 }
