@@ -41,9 +41,12 @@ public class YouTubeAutoWatchLater
         await _youTubeService.SetUploadsPlaylistForSubscriptions(subscriptions);
         _logger.LogInformation("Finished setting uploads playlist of subscriptions");
 
+        _logger.LogInformation("Getting last successful execution date time...");
+        var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
+        _logger.LogInformation($"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime} UTC");
+
         _logger.LogInformation("Setting recent videos of subscriptions...");
-        var newerThan = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
-        await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, newerThan);
+        await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, lastSuccessfulExecutionDateTime);
         _logger.LogInformation("Finished setting recent videos of subscriptions");
 
         await _youTubeService.AddRecentVideosToPlaylist(subscriptions);
