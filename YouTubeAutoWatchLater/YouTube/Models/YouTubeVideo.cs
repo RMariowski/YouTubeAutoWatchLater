@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater.Models;
+﻿namespace YouTubeAutoWatchLater.YouTube.Models;
 
 public record YouTubeVideo(string Id, string Kind, string Title, DateTime PublishedAt)
 {

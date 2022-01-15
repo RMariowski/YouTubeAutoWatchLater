@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Extensions;
 using YouTubeAutoWatchLater.GoogleApis;
-using YouTubeAutoWatchLater.Models;
 using YouTubeAutoWatchLater.Settings;
+using YouTubeAutoWatchLater.YouTube.Models;
 
 namespace YouTubeAutoWatchLater.YouTube;
 

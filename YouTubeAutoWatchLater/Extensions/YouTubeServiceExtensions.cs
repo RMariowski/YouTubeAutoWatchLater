@@ -1,4 +1,4 @@
-﻿using YouTubeAutoWatchLater.Models;
+﻿using YouTubeAutoWatchLater.YouTube.Models;
 
 namespace YouTubeAutoWatchLater.Extensions;
 
