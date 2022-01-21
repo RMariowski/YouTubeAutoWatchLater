@@ -2,11 +2,12 @@
 using Azure;
 using Azure.Data.Tables;
 
-namespace YouTubeAutoWatchLater.Repositories;
+namespace YouTubeAutoWatchLater.Repositories.Configuration;
 
 public class ConfigurationTableStorageRepository : IConfigurationRepository
 {
     private const string TableName = "Configurations";
+    private const string LastSuccessfulExecutionPropKey = "LastSuccessfulExecution";
     private readonly (string PartitionKey, string RowKey) _lastSuccessfulRun = ("General", "LastSuccessfulRun");
 
     private readonly TableClient _tableClient;
@@ -33,13 +34,17 @@ public class ConfigurationTableStorageRepository : IConfigurationRepository
                 throw;
         }
 
-        var dateTimeOffset = entityResponse?.Value.Timestamp ?? DateTimeOffset.UtcNow;
-        return dateTimeOffset.UtcDateTime;
+        var lastSuccessfulExecution = entityResponse?.Value
+            .GetDateTime(LastSuccessfulExecutionPropKey) ?? DateTime.UtcNow;
+        return lastSuccessfulExecution;
     }
 
     public async Task SetLastSuccessfulExecutionDateTimeToNow()
     {
-        var entity = new TableEntity(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey);
+        var entity = new TableEntity(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey)
+        {
+            [LastSuccessfulExecutionPropKey] = DateTime.UtcNow
+        };
         await _tableClient.UpsertEntityAsync(entity);
     }
 }

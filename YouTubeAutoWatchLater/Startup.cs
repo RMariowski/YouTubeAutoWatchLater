@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using YouTubeAutoWatchLater.GoogleApis;
-using YouTubeAutoWatchLater.Repositories;
+using YouTubeAutoWatchLater.Repositories.Configuration;
 using YouTubeAutoWatchLater.Settings;
 using YouTubeAutoWatchLater.YouTube;
 

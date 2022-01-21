@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Repositories;
+using YouTubeAutoWatchLater.Repositories.Configuration;
 using YouTubeAutoWatchLater.YouTube;
 
 namespace YouTubeAutoWatchLater;
