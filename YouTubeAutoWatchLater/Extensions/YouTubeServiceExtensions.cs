@@ -17,7 +17,7 @@ public static class YouTubeServiceExtensions
     public static async Task<IList<YouTubeVideo>> GetRecentVideos(this YouTubeApi youTubeApi,
         string playlistId, DateTime dateTime)
     {
-        const int fetchCount = 5;
+        const int fetchCount = 10;
 
         List<YouTubeVideo> recentVideos = new();
 
