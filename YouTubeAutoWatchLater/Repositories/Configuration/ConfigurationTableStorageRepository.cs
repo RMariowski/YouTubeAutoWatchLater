@@ -7,7 +7,7 @@ namespace YouTubeAutoWatchLater.Repositories.Configuration;
 public class ConfigurationTableStorageRepository : IConfigurationRepository
 {
     private const string TableName = "Configurations";
-    private const string LastSuccessfulExecutionPropKey = "LastSuccessfulExecution";
+    private const string ValuePropKey = "Value";
     private readonly (string PartitionKey, string RowKey) _lastSuccessfulRun = ("General", "LastSuccessfulRun");
 
     private readonly TableClient _tableClient;
@@ -34,16 +34,19 @@ public class ConfigurationTableStorageRepository : IConfigurationRepository
                 throw;
         }
 
-        var lastSuccessfulExecution = entityResponse?.Value
-            .GetDateTime(LastSuccessfulExecutionPropKey) ?? DateTime.UtcNow;
-        return lastSuccessfulExecution;
+        string? lastSuccessfulExecutionAsString = entityResponse?.Value.GetString(ValuePropKey);
+        if (string.IsNullOrWhiteSpace(lastSuccessfulExecutionAsString))
+            return DateTime.UtcNow;
+
+        var lastSuccessfulExecution = DateTimeOffset.Parse(lastSuccessfulExecutionAsString);
+        return lastSuccessfulExecution.UtcDateTime;
     }
 
     public async Task SetLastSuccessfulExecutionDateTimeToNow()
     {
         var entity = new TableEntity(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey)
         {
-            [LastSuccessfulExecutionPropKey] = DateTime.UtcNow
+            [ValuePropKey] = DateTimeOffset.UtcNow.ToString("o")
         };
         await _tableClient.UpsertEntityAsync(entity);
     }
