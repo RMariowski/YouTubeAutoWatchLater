@@ -78,7 +78,7 @@ public class YouTubeService : IYouTubeService
         }
     }
 
-    public async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTime dateTime)
+    public async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime)
     {
         ThrowIfYouTubeServiceIsNull();
 

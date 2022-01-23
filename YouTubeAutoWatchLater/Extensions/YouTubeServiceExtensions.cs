@@ -15,7 +15,7 @@ public static class YouTubeServiceExtensions
     }
 
     public static async Task<IList<YouTubeVideo>> GetRecentVideos(this YouTubeApi youTubeApi,
-        string playlistId, DateTime dateTime)
+        string playlistId, DateTimeOffset dateTime)
     {
         const int fetchCount = 10;
 
@@ -24,13 +24,13 @@ public static class YouTubeServiceExtensions
         string nextPageToken;
         do
         {
-            var playlistItemsListRequest = youTubeApi.PlaylistItems.List("snippet");
+            var playlistItemsListRequest = youTubeApi.PlaylistItems.List("snippet,contentDetails");
             playlistItemsListRequest.PlaylistId = playlistId;
             playlistItemsListRequest.MaxResults = fetchCount;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
-                .Where(playlistItem => playlistItem.Snippet.PublishedAt > dateTime)
+                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > dateTime)
                 .Select(YouTubeVideo.From)
                 .ToArray();
 

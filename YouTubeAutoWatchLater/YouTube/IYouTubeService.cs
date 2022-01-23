@@ -8,7 +8,7 @@ public interface IYouTubeService
 
     Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions);
 
-    Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTime dateTime);
+    Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime);
 
     Task AddRecentVideosToPlaylist(Subscriptions subscriptions);
 }
