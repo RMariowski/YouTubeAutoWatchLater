@@ -102,6 +102,7 @@ public class YouTubeService : IYouTubeService
         var recentVideos = subscriptions.Values
             .SelectMany(subscription => subscription.RecentVideos!)
             .OrderByDescending(video => video.PublishedAt)
+            .ThenByDescending(video => video.AddedToUploadPlaylistAt)
             .ToArray();
 
         if (recentVideos.Length == 0)
