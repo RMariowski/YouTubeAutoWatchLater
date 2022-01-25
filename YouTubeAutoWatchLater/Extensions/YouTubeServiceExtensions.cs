@@ -30,7 +30,8 @@ public static class YouTubeServiceExtensions
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
-                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > dateTime)
+                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > dateTime ||
+                                       playlistItem.Snippet.PublishedAt > dateTime)
                 .Select(YouTubeVideo.From)
                 .ToArray();
 
