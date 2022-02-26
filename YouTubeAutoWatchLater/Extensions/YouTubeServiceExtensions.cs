@@ -21,12 +21,13 @@ public static class YouTubeServiceExtensions
 
         List<YouTubeVideo> recentVideos = new();
 
-        string nextPageToken;
+        var nextPageToken = string.Empty;
         do
         {
             var playlistItemsListRequest = youTubeApi.PlaylistItems.List("snippet,contentDetails");
             playlistItemsListRequest.PlaylistId = playlistId;
             playlistItemsListRequest.MaxResults = fetchCount;
+            playlistItemsListRequest.PageToken = nextPageToken;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items

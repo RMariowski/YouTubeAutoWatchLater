@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Extensions;
 using YouTubeAutoWatchLater.Repositories.Configuration;
 using YouTubeAutoWatchLater.YouTube;
+using YouTubeAutoWatchLater.YouTube.Models;
 
 namespace YouTubeAutoWatchLater;
 
@@ -22,7 +25,6 @@ public class YouTubeAutoWatchLater
         _logger = logger;
     }
 
-    [Singleton]
     [FunctionName(nameof(Run))]
     public async Task Run(
         [TimerTrigger("%Cron%"
@@ -30,31 +32,77 @@ public class YouTubeAutoWatchLater
             , RunOnStartup = true
 #endif
         )]
-        TimerInfo timerInfo)
+        TimerInfo timerInfo,
+        [DurableClient] IDurableOrchestrationClient client)
     {
-        _logger.LogInformation("Initializing YouTube service...");
-        await _youTubeService.Init();
-        _logger.LogInformation("Finished initializing YouTube service");
+        await client.StartNewAsync(nameof(Orchestrator));
+    }
 
-        _logger.LogInformation("Getting subscriptions...");
-        var subscriptions = await _youTubeService.GetMySubscriptions();
-        _logger.LogInformation("Finished getting subscriptions");
+    [FunctionName(nameof(Orchestrator))]
+    public async Task Orchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+    {
+        var lastSuccessfulExecutionDateTime = await context.CallActivityAsync<DateTime>(
+            nameof(GetLastSuccessfulExecutionActivity), null);
 
-        _logger.LogInformation("Setting uploads playlist for subscriptions");
-        await _youTubeService.SetUploadsPlaylistForSubscriptions(subscriptions);
-        _logger.LogInformation("Finished setting uploads playlist of subscriptions");
+        await context.CallSubOrchestratorAsync(nameof(SubscriptionsOrchestrator), lastSuccessfulExecutionDateTime);
 
+        await context.CallActivityAsync(nameof(SetLastSuccessfulExecutionActivity), null);
+    }
+
+    [FunctionName(nameof(GetLastSuccessfulExecutionActivity))]
+    public async Task<DateTime> GetLastSuccessfulExecutionActivity([ActivityTrigger] IDurableActivityContext context)
+    {
         _logger.LogInformation("Getting last successful execution date time...");
         var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
         _logger.LogInformation(
             $"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime:o} UTC");
 
-        _logger.LogInformation("Setting recent videos of subscriptions...");
-        await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, lastSuccessfulExecutionDateTime);
-        _logger.LogInformation("Finished setting recent videos of subscriptions");
+        return lastSuccessfulExecutionDateTime;
+    }
 
-        await _youTubeService.AddRecentVideosToPlaylist(subscriptions);
+    [FunctionName(nameof(SubscriptionsOrchestrator))]
+    public async Task SubscriptionsOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+    {
+        var lastSuccessfulExecutionDateTime = context.GetInput<DateTime>();
 
+        var subscriptions = await context.CallActivityAsync<Subscriptions>(nameof(GetSubscriptionsActivity), null);
+
+        await context.CallInBatches(
+            subscription => context.CallSubOrchestratorAsync(nameof(SubscriptionOrchestrator),
+                (subscription, lastSuccessfulExecutionDateTime)),
+            subscriptions.Values.ToArray());
+    }
+
+    [FunctionName(nameof(GetSubscriptionsActivity))]
+    public async Task<Subscriptions> GetSubscriptionsActivity([ActivityTrigger] IDurableActivityContext context)
+    {
+        _logger.LogInformation("Getting subscriptions...");
+        var subscriptions = await _youTubeService.GetMySubscriptions();
+        _logger.LogInformation($"Finished getting {subscriptions.Count} subscriptions");
+
+        _logger.LogInformation("Setting uploads playlist for subscriptions");
+        await _youTubeService.SetUploadsPlaylistForSubscriptions(subscriptions);
+        _logger.LogInformation("Finished setting uploads playlist of subscriptions");
+
+        return subscriptions;
+    }
+
+    [FunctionName(nameof(SubscriptionOrchestrator))]
+    public async Task SubscriptionOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+    {
+        var (subscription, lastSuccessfulExecutionDateTime) = context.GetInput<(YouTubeChannel, DateTime)>();
+
+        _logger.LogInformation($"Getting recent videos of {subscription}...");
+        var recentVideos = await _youTubeService.GetRecentVideosOfChannel(
+            subscription, lastSuccessfulExecutionDateTime);
+        _logger.LogInformation($"Finished getting recent videos of {subscription}");
+
+        await _youTubeService.AddVideosToPlaylist(subscription, recentVideos);
+    }
+
+    [FunctionName(nameof(SetLastSuccessfulExecutionActivity))]
+    public async Task SetLastSuccessfulExecutionActivity([ActivityTrigger] IDurableActivityContext context)
+    {
         _logger.LogInformation("Setting last successful execution date time...");
         await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
         _logger.LogInformation("Finished setting last successful execution date time");

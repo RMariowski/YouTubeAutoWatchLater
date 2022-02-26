@@ -1,16 +1,18 @@
-﻿namespace YouTubeAutoWatchLater.YouTube;
+﻿using YouTubeAutoWatchLater.YouTube.Models;
+
+namespace YouTubeAutoWatchLater.YouTube;
 
 public interface IYouTubeService
 {
     Task<string> GetRefreshToken();
 
-    Task Init();
+    YouTubeApi Init();
 
     Task<Subscriptions> GetMySubscriptions();
 
     Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions);
 
-    Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime);
+    Task<IList<YouTubeVideo>> GetRecentVideosOfChannel(YouTubeChannel channel, DateTimeOffset dateTime);
 
-    Task AddRecentVideosToPlaylist(Subscriptions subscriptions);
+    Task AddVideosToPlaylist(YouTubeChannel subscription, IList<YouTubeVideo> videos);
 }

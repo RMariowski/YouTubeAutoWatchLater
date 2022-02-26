@@ -13,13 +13,16 @@ public class YouTubeService : IYouTubeService
     private readonly IGoogleApis _googleApis;
     private readonly ISettings _settings;
     private readonly ILogger<YouTubeService> _logger;
-    private YouTubeApi? _youTubeApi;
+    private readonly Lazy<YouTubeApi> _youTubeApi;
+
+    private string _accessToken = string.Empty;
 
     public YouTubeService(IGoogleApis googleApis, ISettings settings, ILogger<YouTubeService> logger)
     {
         _googleApis = googleApis;
         _settings = settings;
         _logger = logger;
+        _youTubeApi = new Lazy<YouTubeApi>(Init);
     }
 
     public async Task<string> GetRefreshToken()
@@ -31,27 +34,34 @@ public class YouTubeService : IYouTubeService
         return credentials.Token.RefreshToken;
     }
 
-    public async Task Init()
+    public YouTubeApi Init()
     {
-        _logger.LogInformation("Getting access token...");
-        string accessToken = await _googleApis.GetAccessToken();
-        _logger.LogInformation("Finished getting access token");
+        _logger.LogInformation("Initializing YouTube service...");
+
+        if (string.IsNullOrEmpty(_accessToken))
+        {
+            _logger.LogInformation("Getting access token...");
+            _accessToken = _googleApis.GetAccessToken().GetAwaiter().GetResult();
+            _logger.LogInformation("Finished getting access token");
+        }
 
         _logger.LogInformation("Creating YouTube API...");
-        _youTubeApi = _googleApis.CreateYouTubeService(accessToken);
+        var youTubeApi = _googleApis.CreateYouTubeService(_accessToken);
         _logger.LogInformation("Finished creating YouTube API");
+
+        _logger.LogInformation("Finished initializing YouTube service");
+
+        return youTubeApi;
     }
 
     public async Task<Subscriptions> GetMySubscriptions()
     {
-        ThrowIfYouTubeServiceIsNull();
-
         Subscriptions youTubeSubscriptions = new();
 
         var nextPageToken = string.Empty;
         do
         {
-            var subscriptionsListRequest = _youTubeApi!.Subscriptions.List("snippet");
+            var subscriptionsListRequest = _youTubeApi.Value.Subscriptions.List("snippet");
             subscriptionsListRequest.MaxResults = MaxResults;
             subscriptionsListRequest.Mine = true;
             subscriptionsListRequest.PageToken = nextPageToken;
@@ -69,15 +79,13 @@ public class YouTubeService : IYouTubeService
 
     public async Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions)
     {
-        ThrowIfYouTubeServiceIsNull();
-
         var chunks = subscriptions.Chunk(MaxResults).ToArray();
         for (var i = 0; i < chunks.Length; i++)
         {
             var chunkedSubscriptions = chunks[i];
 
             _logger.LogInformation($"Getting channels for subscriptions chunk {i + 1} of {chunks.Length}");
-            var channelsOfSubscriptions = await _youTubeApi!.GetChannelsOfSubscriptions(chunkedSubscriptions);
+            var channelsOfSubscriptions = await _youTubeApi.Value.GetChannelsOfSubscriptions(chunkedSubscriptions);
             _logger.LogInformation($"Finished getting channels for subscriptions chunk {i + 1} of {chunks.Length}");
 
             foreach (var channel in channelsOfSubscriptions)
@@ -87,54 +95,40 @@ public class YouTubeService : IYouTubeService
         }
     }
 
-    public async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime)
+    public async Task<IList<YouTubeVideo>> GetRecentVideosOfChannel(YouTubeChannel channel, DateTimeOffset dateTime)
     {
-        ThrowIfYouTubeServiceIsNull();
+        if (string.IsNullOrEmpty(channel.UploadsPlaylist))
+            return new List<YouTubeVideo>();
 
-        foreach (var (_, channel) in subscriptions)
-        {
-            if (string.IsNullOrEmpty(channel.UploadsPlaylist))
-                continue;
+        _logger.LogInformation($"Getting uploads playlist items of {channel}");
+        var recentVideos = await _youTubeApi.Value.GetRecentVideos(channel.UploadsPlaylist, dateTime);
+        _logger.LogInformation($"Finished getting uploads playlist items of {channel}");
 
-            _logger.LogInformation($"Getting uploads playlist items of {channel}");
-            var recentVideos = await _youTubeApi!.GetRecentVideos(channel.UploadsPlaylist, dateTime);
-            _logger.LogInformation($"Finished getting uploads playlist items of {channel}");
-
-            channel.RecentVideos = recentVideos;
-        }
+        return recentVideos;
     }
 
-    public async Task AddRecentVideosToPlaylist(Subscriptions subscriptions)
+    public async Task AddVideosToPlaylist(YouTubeChannel subscription, IList<YouTubeVideo> videos)
     {
-        ThrowIfYouTubeServiceIsNull();
-
-        var recentVideos = subscriptions.Values
-            .SelectMany(subscription => subscription.RecentVideos!)
-            .OrderByDescending(video => video.PublishedAt)
-            .ThenByDescending(video => video.AddedToUploadPlaylistAt)
-            .ToArray();
-
-        if (recentVideos.Length == 0)
+        if (videos.Count == 0)
         {
             _logger.LogInformation("No videos to add");
             return;
         }
 
+        var orderedVideos = videos
+            .OrderByDescending(video => video.PublishedAt)
+            .ThenByDescending(video => video.AddedToUploadPlaylistAt)
+            .ToArray();
+
         _logger.LogInformation("Adding recent videos to playlist...");
 
-        foreach (var video in recentVideos)
+        foreach (var video in orderedVideos)
         {
             _logger.LogInformation($"Adding video {video} to playlist");
-            await _youTubeApi!.AddToPlaylist(_settings.PlaylistId, video);
+            await _youTubeApi.Value.AddToPlaylist(_settings.PlaylistId, video);
             _logger.LogInformation($"Finished adding video {video} to playlist");
         }
 
         _logger.LogInformation("Finished adding recent videos to playlist");
-    }
-
-    private void ThrowIfYouTubeServiceIsNull()
-    {
-        if (_youTubeApi is null)
-            throw new ApplicationException("YouTube service is not initialized");
     }
 }
