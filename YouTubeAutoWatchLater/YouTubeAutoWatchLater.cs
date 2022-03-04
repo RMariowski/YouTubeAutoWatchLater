@@ -1,4 +1,7 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Repositories.Configuration;
 using YouTubeAutoWatchLater.YouTube;
@@ -54,6 +57,14 @@ public class YouTubeAutoWatchLater
 
         _logger.LogInformation("Setting last successful execution date time...");
         await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
-        _logger.LogInformation($"Finished setting last successful execution date time");
+        _logger.LogInformation("Finished setting last successful execution date time");
+    }
+
+    [Singleton]
+    [FunctionName(nameof(GetRefreshToken))]
+    public async Task<IActionResult> GetRefreshToken([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest request)
+    {
+        string refreshToken = await _youTubeService.GetRefreshToken();
+        return new OkObjectResult(refreshToken);
     }
 }

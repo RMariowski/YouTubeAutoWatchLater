@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Services;
+using Google.Apis.Util.Store;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using YouTubeAutoWatchLater.Settings;
@@ -26,6 +28,15 @@ public class GoogleApis : IGoogleApis
         _settings = settings;
         _logger = logger;
         _clientSecrets = new Lazy<GoogleClientSecrets>(() => GetClientSecrets(_logger));
+    }
+
+    public async Task<UserCredential> Authorize()
+    {
+        var googleClientSecrets = await GoogleClientSecrets.FromFileAsync("client_secrets.json");
+        var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            googleClientSecrets.Secrets, new[] { YouTubeService.Scope.Youtube },
+            "user", CancellationToken.None, new FileDataStore(GetType().ToString()));
+        return credential;
     }
 
     public async Task<string> GetAccessToken()

@@ -2,6 +2,8 @@
 
 public interface IYouTubeService
 {
+    Task<string> GetRefreshToken();
+
     Task Init();
 
     Task<Subscriptions> GetMySubscriptions();

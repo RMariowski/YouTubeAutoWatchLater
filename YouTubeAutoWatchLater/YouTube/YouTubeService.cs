@@ -22,6 +22,15 @@ public class YouTubeService : IYouTubeService
         _logger = logger;
     }
 
+    public async Task<string> GetRefreshToken()
+    {
+        _logger.LogInformation("Starting authorization...");
+        var credentials = await _googleApis.Authorize();
+        _logger.LogInformation("Authorization finished");
+
+        return credentials.Token.RefreshToken;
+    }
+
     public async Task Init()
     {
         _logger.LogInformation("Getting access token...");
