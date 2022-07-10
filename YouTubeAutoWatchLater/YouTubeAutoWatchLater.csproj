@@ -5,11 +5,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Azure.Data.Tables" Version="12.5.0" />
-        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.56.0.2630" />
+        <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
+        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2735" />
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.0" />
+        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
