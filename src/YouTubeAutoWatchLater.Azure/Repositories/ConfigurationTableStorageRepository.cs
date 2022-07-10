@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using Azure;
 using Azure.Data.Tables;
+using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Repositories.Configuration;
+namespace YouTubeAutoWatchLater.Azure.Repositories;
 
 public class ConfigurationTableStorageRepository : IConfigurationRepository
 {

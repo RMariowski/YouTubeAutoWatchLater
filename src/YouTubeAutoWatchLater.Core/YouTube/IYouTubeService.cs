@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater.YouTube;
+﻿namespace YouTubeAutoWatchLater.Core.YouTube;
 
 public interface IYouTubeService
 {

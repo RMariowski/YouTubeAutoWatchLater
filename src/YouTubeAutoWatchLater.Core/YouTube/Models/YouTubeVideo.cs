@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater.YouTube.Models;
+﻿namespace YouTubeAutoWatchLater.Core.YouTube.Models;
 
 public record YouTubeVideo
 (

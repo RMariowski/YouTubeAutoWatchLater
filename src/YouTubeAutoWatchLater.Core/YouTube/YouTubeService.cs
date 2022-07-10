@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Extensions;
-using YouTubeAutoWatchLater.GoogleApis;
-using YouTubeAutoWatchLater.Settings;
-using YouTubeAutoWatchLater.YouTube.Models;
+using YouTubeAutoWatchLater.Core.Extensions;
+using YouTubeAutoWatchLater.Core.GoogleApis;
+using YouTubeAutoWatchLater.Core.Settings;
+using YouTubeAutoWatchLater.Core.YouTube.Models;
 
-namespace YouTubeAutoWatchLater.YouTube;
+namespace YouTubeAutoWatchLater.Core.YouTube;
 
 public class YouTubeService : IYouTubeService
 {

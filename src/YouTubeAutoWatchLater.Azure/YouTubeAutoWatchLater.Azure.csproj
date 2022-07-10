@@ -7,9 +7,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
-        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2735" />
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
         <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
     </ItemGroup>
     <ItemGroup>
@@ -21,7 +19,10 @@
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
         <None Update="client_secrets.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj" />
     </ItemGroup>
 </Project>

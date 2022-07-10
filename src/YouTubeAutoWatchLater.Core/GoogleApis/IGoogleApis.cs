@@ -1,6 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 
-namespace YouTubeAutoWatchLater.GoogleApis;
+namespace YouTubeAutoWatchLater.Core.GoogleApis;
 
 public interface IGoogleApis
 {

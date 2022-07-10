@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater.Repositories.Configuration;
+﻿namespace YouTubeAutoWatchLater.Core.Repositories;
 
 public interface IConfigurationRepository
 {

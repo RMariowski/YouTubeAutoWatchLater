@@ -1,17 +1,13 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading;
+﻿using System.Reflection;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using YouTubeAutoWatchLater.Settings;
-using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
+using YouTubeAutoWatchLater.Core.Settings;
 
-namespace YouTubeAutoWatchLater.GoogleApis;
+namespace YouTubeAutoWatchLater.Core.GoogleApis;
 
 public class GoogleApis : IGoogleApis
 {

@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Repositories.Configuration;
-using YouTubeAutoWatchLater.YouTube;
+using YouTubeAutoWatchLater.Core.Repositories;
+using YouTubeAutoWatchLater.Core.YouTube;
 
-namespace YouTubeAutoWatchLater;
+namespace YouTubeAutoWatchLater.Azure;
 
 public class YouTubeAutoWatchLater
 {
