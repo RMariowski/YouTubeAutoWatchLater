@@ -132,6 +132,25 @@ public class YouTubeService : IYouTubeService
         _logger.LogInformation("Finished adding recent videos to playlist");
     }
 
+    public async Task DeletePrivatePlaylistItems()
+    {
+        ThrowIfYouTubeServiceIsNull();
+
+        _logger.LogInformation($"Getting private playlist items from playlist {_settings.PlaylistId}");
+        var playlistItems = await _youTubeApi!.GetPrivatePlaylistItems(_settings.PlaylistId);
+        _logger.LogInformation($"Finished getting private playlist items from playlist {_settings.PlaylistId}");
+
+        var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
+        _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
+
+        foreach (string playlistItemId in playlistItemIds)
+        {
+            _logger.LogInformation($"Deleting playlist item {playlistItemId}");
+            await _youTubeApi!.DeletePlaylistItem(playlistItemId);
+            _logger.LogInformation($"Finished deleting playlist item {playlistItemId}");
+        }
+    }
+
     private void ThrowIfYouTubeServiceIsNull()
     {
         if (_youTubeApi is null)

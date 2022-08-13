@@ -14,6 +14,37 @@ public static class YouTubeServiceExtensions
         return channelListResponse.Items;
     }
 
+    public static async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItems(this YouTubeApi youTubeApi,
+        string playlistId)
+    {
+        const int fetchCount = 50;
+
+        List<PlaylistItem> playlistItems = new();
+
+        string nextPageToken;
+        do
+        {
+            var playlistItemsListRequest = youTubeApi.PlaylistItems.List("id,status");
+            playlistItemsListRequest.PlaylistId = playlistId;
+            playlistItemsListRequest.MaxResults = fetchCount;
+            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+
+            var privatePlaylistItems = playlistItemsListResponse.Items
+                .Where(item => item.Status.PrivacyStatus == "private");
+            playlistItems.AddRange(privatePlaylistItems);
+
+            nextPageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(nextPageToken));
+
+        return playlistItems;
+    }
+
+    public static async Task DeletePlaylistItem(this YouTubeApi youTubeApi, string playlistItemId)
+    {
+        var playlistItemsDeleteRequest = youTubeApi.PlaylistItems.Delete(playlistItemId);
+        _ = await playlistItemsDeleteRequest.ExecuteAsync();
+    }
+
     public static async Task<IList<YouTubeVideo>> GetRecentVideos(this YouTubeApi youTubeApi,
         string playlistId, DateTimeOffset dateTime)
     {

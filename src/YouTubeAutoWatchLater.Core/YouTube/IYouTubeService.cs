@@ -13,4 +13,6 @@ public interface IYouTubeService
     Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime);
 
     Task AddRecentVideosToPlaylist(Subscriptions subscriptions);
+
+    Task DeletePrivatePlaylistItems();
 }

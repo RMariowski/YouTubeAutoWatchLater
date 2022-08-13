@@ -59,8 +59,23 @@ public class YouTubeAutoWatchLater
     }
 
     [Singleton]
+    [FunctionName(nameof(DeletePrivatePlaylistItems))]
+    public async Task DeletePrivatePlaylistItems(
+        [TimerTrigger("%DeletePrivatePlaylistItemsCron%"
+#if DEBUG
+            , RunOnStartup = true
+#endif
+        )]
+        TimerInfo timerInfo)
+    {
+        await _youTubeService.Init();
+        await _youTubeService.DeletePrivatePlaylistItems();
+    }
+
+    [Singleton]
     [FunctionName(nameof(GetRefreshToken))]
-    public async Task<IActionResult> GetRefreshToken([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest request)
+    public async Task<IActionResult> GetRefreshToken(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest request)
     {
         string refreshToken = await _youTubeService.GetRefreshToken();
         return new OkObjectResult(refreshToken);
