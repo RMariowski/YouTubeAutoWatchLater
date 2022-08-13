@@ -32,11 +32,9 @@ public class YouTubeAutoWatchLater
         )]
         TimerInfo timerInfo)
     {
-        _logger.LogInformation("Initializing YouTube service...");
         await _youTubeService.Init();
-        _logger.LogInformation("Finished initializing YouTube service");
 
-        _logger.LogInformation("Getting subscriptions...");
+        _logger.LogInformation("Getting subscriptions");
         var subscriptions = await _youTubeService.GetMySubscriptions();
         _logger.LogInformation("Finished getting subscriptions");
 
@@ -44,18 +42,18 @@ public class YouTubeAutoWatchLater
         await _youTubeService.SetUploadsPlaylistForSubscriptions(subscriptions);
         _logger.LogInformation("Finished setting uploads playlist of subscriptions");
 
-        _logger.LogInformation("Getting last successful execution date time...");
+        _logger.LogInformation("Getting last successful execution date time");
         var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
         _logger.LogInformation(
             $"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime:o} UTC");
 
-        _logger.LogInformation("Setting recent videos of subscriptions...");
+        _logger.LogInformation("Setting recent videos of subscriptions");
         await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, lastSuccessfulExecutionDateTime);
         _logger.LogInformation("Finished setting recent videos of subscriptions");
 
         await _youTubeService.AddRecentVideosToPlaylist(subscriptions);
 
-        _logger.LogInformation("Setting last successful execution date time...");
+        _logger.LogInformation("Setting last successful execution date time");
         await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
         _logger.LogInformation("Finished setting last successful execution date time");
     }

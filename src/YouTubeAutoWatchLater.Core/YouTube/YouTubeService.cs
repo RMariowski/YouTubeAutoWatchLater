@@ -24,7 +24,7 @@ public class YouTubeService : IYouTubeService
 
     public async Task<string> GetRefreshToken()
     {
-        _logger.LogInformation("Starting authorization...");
+        _logger.LogInformation("Starting authorization");
         var credentials = await _googleApis.Authorize();
         _logger.LogInformation("Authorization finished");
 
@@ -33,11 +33,11 @@ public class YouTubeService : IYouTubeService
 
     public async Task Init()
     {
-        _logger.LogInformation("Getting access token...");
+        _logger.LogInformation("Getting access token");
         string accessToken = await _googleApis.GetAccessToken();
         _logger.LogInformation("Finished getting access token");
 
-        _logger.LogInformation("Creating YouTube API...");
+        _logger.LogInformation("Creating YouTube API");
         _youTubeApi = _googleApis.CreateYouTubeService(accessToken);
         _logger.LogInformation("Finished creating YouTube API");
     }
@@ -120,7 +120,7 @@ public class YouTubeService : IYouTubeService
             return;
         }
 
-        _logger.LogInformation("Adding recent videos to playlist...");
+        _logger.LogInformation("Adding recent videos to playlist");
 
         foreach (var video in recentVideos)
         {

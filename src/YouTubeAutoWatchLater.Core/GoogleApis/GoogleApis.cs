@@ -49,9 +49,9 @@ public class GoogleApis : IGoogleApis
             })
         };
 
-        _logger.LogInformation("Sending request for getting access token...");
+        _logger.LogInformation("Sending request for getting access token");
         var response = await _httpClientFactory.CreateClient().SendAsync(refreshMessage);
-        _logger.LogInformation("Finished sending request for getting access token...");
+        _logger.LogInformation("Finished sending request for getting access token");
 
         if (response.IsSuccessStatusCode is false)
         {
@@ -86,11 +86,11 @@ public class GoogleApis : IGoogleApis
 
         logger.LogInformation($"Creating path of {clientSecretsFileName}");
         string binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-        string rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."))!;
+        string rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
         string clientSecretsFilePath = Path.Combine(rootDirectory, clientSecretsFileName);
         logger.LogInformation($"Created path: {clientSecretsFilePath}");
 
-        logger.LogInformation($"Reading {clientSecretsFilePath} file...");
+        logger.LogInformation($"Reading {clientSecretsFilePath} file");
         var googleClientSecrets = GoogleClientSecrets.FromFile(clientSecretsFilePath);
         if (googleClientSecrets is null)
             throw new ApplicationException($"{clientSecretsFilePath} file not found");
