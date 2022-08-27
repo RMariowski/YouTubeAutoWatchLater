@@ -1,0 +1,125 @@
+﻿using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Core.Models;
+using YouTubeAutoWatchLater.Core.Repositories;
+using YouTubePlaylistItem = Google.Apis.YouTube.v3.Data.PlaylistItem;
+using PlaylistItem = YouTubeAutoWatchLater.Core.Models.PlaylistItem;
+using Video = YouTubeAutoWatchLater.Core.Models.Video;
+
+namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
+
+public class YouTubePlaylistItemRepository : IPlaylistItemRepository
+{
+    private readonly YouTubeService _youTubeService;
+    private readonly ILogger<YouTubePlaylistItemRepository> _logger;
+
+    public YouTubePlaylistItemRepository(YouTubeService youTubeService, ILogger<YouTubePlaylistItemRepository> logger)
+    {
+        _youTubeService = youTubeService;
+        _logger = logger;
+    }
+
+    public async Task AddToPlaylist(string playlistId, Video video)
+    {
+        YouTubePlaylistItem playlistItem = new()
+        {
+            Snippet = new PlaylistItemSnippet
+            {
+                Position = 0,
+                PlaylistId = playlistId,
+                ResourceId = new ResourceId
+                {
+                    VideoId = video.Id.Value,
+                    Kind = video.Kind
+                }
+            }
+        };
+        var playlistItemsInsertRequest = _youTubeService.PlaylistItems.Insert(playlistItem, "snippet");
+        await playlistItemsInsertRequest.ExecuteAsync();
+    }
+
+    public async Task<IReadOnlyList<Video>> GetRecentVideos(string playlistId, DateTimeOffset dateTime)
+    {
+        const int fetchCount = 10;
+
+        List<Video> recentVideos = new();
+
+        string nextPageToken;
+        do
+        {
+            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
+            playlistItemsListRequest.PlaylistId = playlistId;
+            playlistItemsListRequest.MaxResults = fetchCount;
+            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+
+            var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
+                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > dateTime ||
+                                       playlistItem.Snippet.PublishedAt > dateTime)
+                .Select(playlistItem => new Video
+                (
+                    new VideoId(playlistItem.Snippet.ResourceId.VideoId),
+                    playlistItem.Snippet.ResourceId.Kind,
+                    playlistItem.Snippet.Title,
+                    playlistItem.ContentDetails.VideoPublishedAt!.Value,
+                    playlistItem.Snippet.PublishedAt!.Value
+                ))
+                .ToArray();
+
+            if (videosNewerThanSpecifiedDateTime.Length > 0)
+                recentVideos.AddRange(videosNewerThanSpecifiedDateTime);
+
+            if (videosNewerThanSpecifiedDateTime.Length < fetchCount)
+                break;
+
+            nextPageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(nextPageToken));
+
+        return recentVideos;
+    }
+
+    public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(string playlistId)
+    {
+        _logger.LogInformation($"Getting private playlist items from playlist {playlistId}");
+
+        List<PlaylistItem> playlistItems = new();
+
+        string nextPageToken;
+        do
+        {
+            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("id,status");
+            playlistItemsListRequest.PlaylistId = playlistId;
+            playlistItemsListRequest.MaxResults = Consts.MaxResults;
+            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+
+            var privatePlaylistItems = playlistItemsListResponse.Items
+                .Where(item => item.Status.PrivacyStatus == "private")
+                .Select(item => new PlaylistItem(new PlaylistItemId(item.Id)));
+            playlistItems.AddRange(privatePlaylistItems);
+
+            nextPageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(nextPageToken));
+
+        _logger.LogInformation($"Finished getting private playlist items from playlist {playlistId}");
+
+        return playlistItems;
+    }
+
+    public async Task DeletePlaylistItem(PlaylistItemId id)
+    {
+        _logger.LogInformation($"Deleting playlist item {id}");
+        var playlistItemsDeleteRequest = _youTubeService.PlaylistItems.Delete(id.Value);
+        _ = await playlistItemsDeleteRequest.ExecuteAsync();
+        _logger.LogInformation($"Finished deleting playlist item {id}");
+    }
+
+    public async Task DeletePrivatePlaylistItemsOfPlaylist(string playlistId)
+    {
+        var playlistItems = await GetPrivatePlaylistItemsOfPlaylist(playlistId);
+        var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
+        _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
+
+        foreach (var playlistItemId in playlistItemIds)
+            await DeletePlaylistItem(playlistItemId);
+    }
+}

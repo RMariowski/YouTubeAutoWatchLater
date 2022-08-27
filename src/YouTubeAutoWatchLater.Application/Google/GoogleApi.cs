@@ -3,27 +3,24 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using Google.Apis.YouTube.v3;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using YouTubeAutoWatchLater.Core.Settings;
+using YouTubeAutoWatchLater.Application.Settings;
 
-namespace YouTubeAutoWatchLater.Core.GoogleApis;
+namespace YouTubeAutoWatchLater.Application.Google;
 
-public class GoogleApis : IGoogleApis
+public class GoogleApi : IGoogleApi
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ISettings _settings;
-    private readonly ILogger<GoogleApis> _logger;
-    private readonly Lazy<GoogleClientSecrets> _clientSecrets;
+    private readonly ILogger<GoogleApi> _logger;
 
-    private GoogleClientSecrets ClientSecrets => _clientSecrets.Value;
-
-    public GoogleApis(IHttpClientFactory httpClientFactory, ISettings settings, ILogger<GoogleApis> logger)
+    public GoogleApi(IHttpClientFactory httpClientFactory, ISettings settings, ILogger<GoogleApi> logger)
     {
         _httpClientFactory = httpClientFactory;
         _settings = settings;
         _logger = logger;
-        _clientSecrets = new Lazy<GoogleClientSecrets>(() => GetClientSecrets(_logger));
     }
 
     public async Task<UserCredential> Authorize()
@@ -37,8 +34,8 @@ public class GoogleApis : IGoogleApis
 
     public async Task<string> GetAccessToken()
     {
-        var secrets = ClientSecrets.Secrets;
-        var refreshMessage = new HttpRequestMessage(HttpMethod.Post, "https://www.googleapis.com/oauth2/v4/token")
+        var secrets = GetClientSecrets().Secrets;
+        HttpRequestMessage refreshMessage = new(HttpMethod.Post, "https://www.googleapis.com/oauth2/v4/token")
         {
             Content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
             {
@@ -71,30 +68,29 @@ public class GoogleApis : IGoogleApis
 
     public YouTubeService CreateYouTubeService(string accessToken)
     {
-        var initializer = new BaseClientService.Initializer
+        BaseClientService.Initializer initializer = new()
         {
             HttpClientInitializer = GoogleCredential.FromAccessToken(accessToken),
             ApplicationName = nameof(YouTubeAutoWatchLater)
         };
-        var youtubeService = new YouTubeService(initializer);
-        return youtubeService;
+        return new YouTubeService(initializer);
     }
 
-    private static GoogleClientSecrets GetClientSecrets(ILogger logger)
+    private GoogleClientSecrets GetClientSecrets()
     {
         const string clientSecretsFileName = "client_secrets.json";
 
-        logger.LogInformation($"Creating path of {clientSecretsFileName}");
+        _logger.LogInformation($"Creating path of {clientSecretsFileName}");
         string binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         string rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
         string clientSecretsFilePath = Path.Combine(rootDirectory, clientSecretsFileName);
-        logger.LogInformation($"Created path: {clientSecretsFilePath}");
+        _logger.LogInformation($"Created path: {clientSecretsFilePath}");
 
-        logger.LogInformation($"Reading {clientSecretsFilePath} file");
+        _logger.LogInformation($"Reading {clientSecretsFilePath} file");
         var googleClientSecrets = GoogleClientSecrets.FromFile(clientSecretsFilePath);
         if (googleClientSecrets is null)
             throw new ApplicationException($"{clientSecretsFilePath} file not found");
-        logger.LogInformation($"Finished reading {clientSecretsFilePath} file");
+        _logger.LogInformation($"Finished reading {clientSecretsFilePath} file");
 
         return googleClientSecrets;
     }

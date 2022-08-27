@@ -1,8 +1,9 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.YouTube.v3;
 
-namespace YouTubeAutoWatchLater.Core.GoogleApis;
+namespace YouTubeAutoWatchLater.Application.Google;
 
-public interface IGoogleApis
+public interface IGoogleApi
 {
     Task<UserCredential> Authorize();
 

@@ -1,4 +1,4 @@
-﻿using YouTubeAutoWatchLater.Core.Settings;
+﻿using YouTubeAutoWatchLater.Application.Settings;
 
 namespace YouTubeAutoWatchLater.Azure.Settings;
 

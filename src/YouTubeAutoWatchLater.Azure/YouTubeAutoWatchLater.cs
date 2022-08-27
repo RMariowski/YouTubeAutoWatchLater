@@ -3,23 +3,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Application.Google;
+using YouTubeAutoWatchLater.Application.Settings;
+using YouTubeAutoWatchLater.Application.YouTube;
 using YouTubeAutoWatchLater.Core.Repositories;
-using YouTubeAutoWatchLater.Core.YouTube;
 
 namespace YouTubeAutoWatchLater.Azure;
 
 public class YouTubeAutoWatchLater
 {
-    private readonly IYouTubeService _youTubeService;
-    private readonly IConfigurationRepository _configurationRepository;
+    private readonly YouTubeAutoWatchLaterHandler _youTubeAutoWatchLaterHandler;
+    private readonly IGoogleApi _googleApi;
+    private readonly IPlaylistItemRepository _playlistItemRepository;
+    private readonly ISettings _settings;
     private readonly ILogger<YouTubeAutoWatchLater> _logger;
 
-    public YouTubeAutoWatchLater(IYouTubeService youTubeService, IConfigurationRepository configurationRepository,
-        ILogger<YouTubeAutoWatchLater> logger)
+    public YouTubeAutoWatchLater(IGoogleApi googleApi, ISettings settings, ILogger<YouTubeAutoWatchLater> logger,
+        IPlaylistItemRepository playlistItemRepository, YouTubeAutoWatchLaterHandler youTubeAutoWatchLaterHandler)
     {
-        _youTubeService = youTubeService;
-        _configurationRepository = configurationRepository;
+        _googleApi = googleApi;
+        _settings = settings;
         _logger = logger;
+        _playlistItemRepository = playlistItemRepository;
+        _youTubeAutoWatchLaterHandler = youTubeAutoWatchLaterHandler;
     }
 
     [Singleton]
@@ -32,30 +38,7 @@ public class YouTubeAutoWatchLater
         )]
         TimerInfo timerInfo)
     {
-        await _youTubeService.Init();
-
-        _logger.LogInformation("Getting subscriptions");
-        var subscriptions = await _youTubeService.GetMySubscriptions();
-        _logger.LogInformation("Finished getting subscriptions");
-
-        _logger.LogInformation("Setting uploads playlist for subscriptions");
-        await _youTubeService.SetUploadsPlaylistForSubscriptions(subscriptions);
-        _logger.LogInformation("Finished setting uploads playlist of subscriptions");
-
-        _logger.LogInformation("Getting last successful execution date time");
-        var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
-        _logger.LogInformation(
-            $"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime:o} UTC");
-
-        _logger.LogInformation("Setting recent videos of subscriptions");
-        await _youTubeService.SetRecentVideosForSubscriptions(subscriptions, lastSuccessfulExecutionDateTime);
-        _logger.LogInformation("Finished setting recent videos of subscriptions");
-
-        await _youTubeService.AddRecentVideosToPlaylist(subscriptions);
-
-        _logger.LogInformation("Setting last successful execution date time");
-        await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
-        _logger.LogInformation("Finished setting last successful execution date time");
+        await _youTubeAutoWatchLaterHandler.Handle();
     }
 
     [Singleton]
@@ -68,16 +51,19 @@ public class YouTubeAutoWatchLater
         )]
         TimerInfo timerInfo)
     {
-        await _youTubeService.Init();
-        await _youTubeService.DeletePrivatePlaylistItems();
+        await _playlistItemRepository.DeletePrivatePlaylistItemsOfPlaylist(_settings.PlaylistId);
     }
 
     [Singleton]
     [FunctionName(nameof(GetRefreshToken))]
     public async Task<IActionResult> GetRefreshToken(
-        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest request)
+        [HttpTrigger(AuthorizationLevel.Function, "get")]
+        HttpRequest request)
     {
-        string refreshToken = await _youTubeService.GetRefreshToken();
-        return new OkObjectResult(refreshToken);
+        _logger.LogInformation("Starting authorization");
+        var credentials = await _googleApi.Authorize();
+        _logger.LogInformation("Authorization finished");
+
+        return new OkObjectResult(credentials.Token.RefreshToken);
     }
 }
