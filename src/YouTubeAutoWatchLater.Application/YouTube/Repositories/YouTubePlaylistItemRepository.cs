@@ -20,14 +20,14 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         _logger = logger;
     }
 
-    public async Task AddToPlaylist(string playlistId, Video video)
+    public async Task AddToPlaylist(PlaylistId playlistId, Video video)
     {
         YouTubePlaylistItem playlistItem = new()
         {
             Snippet = new PlaylistItemSnippet
             {
                 Position = 0,
-                PlaylistId = playlistId,
+                PlaylistId = playlistId.Value,
                 ResourceId = new ResourceId
                 {
                     VideoId = video.Id.Value,
@@ -39,7 +39,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         await playlistItemsInsertRequest.ExecuteAsync();
     }
 
-    public async Task<IReadOnlyList<Video>> GetRecentVideos(string playlistId, DateTimeOffset dateTime)
+    public async Task<IReadOnlyList<Video>> GetRecentVideos(PlaylistId playlistId, DateTimeOffset dateTime)
     {
         const int fetchCount = 10;
 
@@ -49,7 +49,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         do
         {
             var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
-            playlistItemsListRequest.PlaylistId = playlistId;
+            playlistItemsListRequest.PlaylistId = playlistId.Value;
             playlistItemsListRequest.MaxResults = fetchCount;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
@@ -78,7 +78,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         return recentVideos;
     }
 
-    public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(string playlistId)
+    public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(PlaylistId playlistId)
     {
         _logger.LogInformation($"Getting private playlist items from playlist {playlistId}");
 
@@ -88,7 +88,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         do
         {
             var playlistItemsListRequest = _youTubeService.PlaylistItems.List("id,status");
-            playlistItemsListRequest.PlaylistId = playlistId;
+            playlistItemsListRequest.PlaylistId = playlistId.Value;
             playlistItemsListRequest.MaxResults = Consts.MaxResults;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
@@ -113,7 +113,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
         _logger.LogInformation($"Finished deleting playlist item {id}");
     }
 
-    public async Task DeletePrivatePlaylistItemsOfPlaylist(string playlistId)
+    public async Task DeletePrivatePlaylistItemsOfPlaylist(PlaylistId playlistId)
     {
         var playlistItems = await GetPrivatePlaylistItemsOfPlaylist(playlistId);
         var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();

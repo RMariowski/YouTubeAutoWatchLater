@@ -7,13 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj"/>
+        <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2756"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1"/>
+        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2756" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     </ItemGroup>
 
 </Project>

@@ -5,13 +5,13 @@ namespace YouTubeAutoWatchLater.Core.Repositories;
 
 public interface IPlaylistItemRepository
 {
-    Task AddToPlaylist(string playlistId, Video video);
+    Task AddToPlaylist(PlaylistId playlistId, Video video);
 
-    Task<IReadOnlyList<Video>> GetRecentVideos(string playlistId, DateTimeOffset dateTime);
+    Task<IReadOnlyList<Video>> GetRecentVideos(PlaylistId playlistId, DateTimeOffset dateTime);
     
-    Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(string playlistId);
+    Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(PlaylistId playlistId);
     
     Task DeletePlaylistItem(PlaylistItemId id);
 
-    Task DeletePrivatePlaylistItemsOfPlaylist(string playlistId);
+    Task DeletePrivatePlaylistItemsOfPlaylist(PlaylistId playlistId);
 }

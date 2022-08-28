@@ -16,35 +16,6 @@ public class YouTubeChannelRepository : IChannelRepository
         _logger = logger;
     }
 
-    public async Task<Subscriptions> GetMySubscriptions()
-    {
-        Subscriptions youTubeSubscriptions = new();
-
-        var nextPageToken = string.Empty;
-        do
-        {
-            var subscriptionsListRequest = _youTubeService.Subscriptions.List("snippet");
-            subscriptionsListRequest.MaxResults = Consts.MaxResults;
-            subscriptionsListRequest.Mine = true;
-            subscriptionsListRequest.PageToken = nextPageToken;
-            var subscriptionsListResponse = await subscriptionsListRequest.ExecuteAsync();
-
-            var subscriptions = subscriptionsListResponse.Items
-                .Select(subscription => new Channel
-                (
-                    subscription.Snippet.ResourceId.ChannelId,
-                    subscription.Snippet.Title
-                ))
-                .ToArray();
-            foreach (var subscription in subscriptions)
-                youTubeSubscriptions.Add(subscription.Id, subscription);
-
-            nextPageToken = subscriptionsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(nextPageToken));
-
-        return youTubeSubscriptions;
-    }
-
     public async Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions)
     {
         var chunks = subscriptions.Chunk(Consts.MaxResults).ToArray();
@@ -55,7 +26,7 @@ public class YouTubeChannelRepository : IChannelRepository
             _logger.LogInformation($"Getting channels of subscriptions chunk {i + 1}/{chunks.Length}");
 
             var channelsListRequest = _youTubeService.Channels.List("contentDetails");
-            channelsListRequest.Id = chunkedSubscriptions.Select(subscription => subscription.Key).ToArray();
+            channelsListRequest.Id = chunkedSubscriptions.Select(subscription => subscription.Key.Value).ToArray();
             channelsListRequest.MaxResults = chunkedSubscriptions.Length;
             var channelListResponse = await channelsListRequest.ExecuteAsync();
             var channelsOfSubscriptions = channelListResponse.Items;
@@ -64,7 +35,9 @@ public class YouTubeChannelRepository : IChannelRepository
 
             foreach (var channel in channelsOfSubscriptions)
             {
-                subscriptions[channel.Id].UploadsPlaylist = channel.ContentDetails.RelatedPlaylists.Uploads;
+                ChannelId channelId = new(channel.Id);
+                PlaylistId playlist = new(channel.ContentDetails.RelatedPlaylists.Uploads);
+                subscriptions[channelId].UploadsPlaylist = playlist;
             }
         }
     }

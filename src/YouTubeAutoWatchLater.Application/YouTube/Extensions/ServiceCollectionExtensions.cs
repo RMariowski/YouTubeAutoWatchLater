@@ -14,9 +14,9 @@ public static class ServiceCollectionExtensions
         return services
             .AddSingleton<IGoogleApi, GoogleApi>()
             .AddSingleton(CreateYouTubeService)
+            .AddSingleton<ISubscriptionRepository, YouTubeSubscriptionRepository>()
             .AddSingleton<IChannelRepository, YouTubeChannelRepository>()
-            .AddSingleton<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
-            .AddSingleton<YouTubeAutoWatchLaterHandler>();
+            .AddSingleton<IPlaylistItemRepository, YouTubePlaylistItemRepository>();
     }
 
     // TODO: Would be good to make it somehow asynchronous
@@ -24,11 +24,11 @@ public static class ServiceCollectionExtensions
     {
         var googleApi = serviceProvider.GetRequiredService<IGoogleApi>();
         var logger = serviceProvider.GetRequiredService<ILogger<YouTubeService>>();
-     
+
         logger.LogInformation("Getting access token");
         string accessToken = googleApi.GetAccessToken().GetAwaiter().GetResult();
         logger.LogInformation("Finished getting access token");
-        
+
         logger.LogInformation("Creating YouTube Service");
         var youTubeService = googleApi.CreateYouTubeService(accessToken);
         logger.LogInformation("Finished creating YouTube API");

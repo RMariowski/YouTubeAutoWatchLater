@@ -1,5 +1,7 @@
-﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using MediatR;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using YouTubeAutoWatchLater.Application.Handlers;
 using YouTubeAutoWatchLater.Application.Repositories;
 using YouTubeAutoWatchLater.Application.Settings;
 using YouTubeAutoWatchLater.Application.YouTube.Extensions;
@@ -19,6 +21,7 @@ public class Startup : FunctionsStartup
             .AddHttpClient()
             .AddSingleton<ISettings, Settings.Settings>()
             .AddYouTube()
+            .AddMediatR(typeof(UpdateAutoWatchLater.Handler).Assembly)
             .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>();
     }
 }
