@@ -93,7 +93,7 @@ public class YouTubePlaylistItemRepository : IPlaylistItemRepository
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var privatePlaylistItems = playlistItemsListResponse.Items
-                .Where(item => item.Status.PrivacyStatus == "private")
+                .Where(item => item.Status.PrivacyStatus is "private" or "privacyStatusUnspecified")
                 .Select(item => new PlaylistItem(new PlaylistItemId(item.Id)));
             playlistItems.AddRange(privatePlaylistItems);
 
