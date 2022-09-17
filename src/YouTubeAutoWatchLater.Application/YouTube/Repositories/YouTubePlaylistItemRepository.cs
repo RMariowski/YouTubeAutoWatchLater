@@ -61,6 +61,7 @@ public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
                     new VideoId(playlistItem.Snippet.ResourceId.VideoId),
                     playlistItem.Snippet.ResourceId.Kind,
                     playlistItem.Snippet.Title,
+                    playlistItem.Snippet.ChannelTitle,
                     playlistItem.ContentDetails.VideoPublishedAt!.Value,
                     playlistItem.Snippet.PublishedAt!.Value
                 ))

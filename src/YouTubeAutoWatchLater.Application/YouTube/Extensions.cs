@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Application.Google;
 using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Application.YouTube.Repositories;
+using YouTubeAutoWatchLater.Application.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.YouTube;
@@ -19,7 +20,8 @@ internal static class Extensions
             .AddSingleton(CreateYouTubeService)
             .AddSingleton<ISubscriptionRepository, YouTubeSubscriptionRepository>()
             .AddSingleton<IChannelRepository, YouTubeChannelRepository>()
-            .AddSingleton<IPlaylistItemRepository, YouTubePlaylistItemRepository>();
+            .AddSingleton<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
+            .AddSingleton<IPlaylistRuleResolver, PlaylistRuleResolver>();
     }
 
     // TODO: Would be good to make it somehow asynchronous

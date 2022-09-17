@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YouTubeAutoWatchLater.Application.Repositories;
 using YouTubeAutoWatchLater.Application.YouTube.Options;
+using YouTubeAutoWatchLater.Application.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
@@ -18,18 +19,18 @@ public sealed class UpdateAutoWatchLater
         private readonly IChannelRepository _channelRepository;
         private readonly IPlaylistItemRepository _playlistItemRepository;
         private readonly IConfigurationRepository _configurationRepository;
-        private readonly YouTubeOptions _options;
+        private readonly IPlaylistRuleResolver _playlistRuleResolver;
         private readonly ILogger<Handler> _logger;
 
         public Handler(ISubscriptionRepository subscriptionRepository, IChannelRepository channelRepository,
             IPlaylistItemRepository playlistItemRepository, IConfigurationRepository configurationRepository,
-            IOptions<YouTubeOptions> options, ILogger<Handler> logger)
+            IPlaylistRuleResolver playlistRuleResolver, ILogger<Handler> logger)
         {
             _subscriptionRepository = subscriptionRepository;
             _channelRepository = channelRepository;
             _playlistItemRepository = playlistItemRepository;
             _configurationRepository = configurationRepository;
-            _options = options.Value;
+            _playlistRuleResolver = playlistRuleResolver;
             _logger = logger;
         }
 
@@ -89,12 +90,13 @@ public sealed class UpdateAutoWatchLater
 
             _logger.LogInformation("Adding recent videos to playlist");
 
-            PlaylistId playlistId = new(_options.PlaylistId);
             foreach (var video in recentVideos)
             {
-                _logger.LogInformation($"Adding {video} to playlist");
+                var playlistId = _playlistRuleResolver.Resolve(video);
+                
+                _logger.LogInformation($"Adding {video} to playlist {playlistId}");
                 await _playlistItemRepository.AddToPlaylist(playlistId, video);
-                _logger.LogInformation($"Finished video {video} to playlist");
+                _logger.LogInformation($"Finished video {video} to playlist {playlistId}");
             }
 
             _logger.LogInformation("Finished adding recent videos to playlist");
