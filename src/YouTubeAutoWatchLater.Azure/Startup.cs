@@ -1,10 +1,7 @@
-﻿using MediatR;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using YouTubeAutoWatchLater.Application.Google;
-using YouTubeAutoWatchLater.Application.Handlers;
+using YouTubeAutoWatchLater.Application;
 using YouTubeAutoWatchLater.Application.Repositories;
-using YouTubeAutoWatchLater.Application.YouTube;
 using YouTubeAutoWatchLater.Azure;
 using YouTubeAutoWatchLater.Azure.Repositories;
 
@@ -19,11 +16,7 @@ public sealed  class Startup : FunctionsStartup
         var configuration = builder.GetContext().Configuration;
 
         builder.Services
-            .AddLogging()
-            .AddHttpClient()
-            .AddGoogle(configuration)
-            .AddYouTube(configuration)
-            .AddMediatR(typeof(UpdateAutoWatchLater.Handler).Assembly)
+            .AddApplication(configuration)
             .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>();
     }
 }

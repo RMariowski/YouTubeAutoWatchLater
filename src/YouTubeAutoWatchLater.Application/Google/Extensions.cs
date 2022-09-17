@@ -4,7 +4,7 @@ using YouTubeAutoWatchLater.Application.Google.Options;
 
 namespace YouTubeAutoWatchLater.Application.Google;
 
-public static class Extensions
+internal static class Extensions
 {
     public static IServiceCollection AddGoogle(this IServiceCollection services, IConfiguration configuration)
     {

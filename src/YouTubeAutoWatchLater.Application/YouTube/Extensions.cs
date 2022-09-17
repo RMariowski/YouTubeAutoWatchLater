@@ -9,7 +9,7 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.YouTube;
 
-public static class Extensions
+internal static class Extensions
 {
     public static IServiceCollection AddYouTube(this IServiceCollection services, IConfiguration configuration)
     {
