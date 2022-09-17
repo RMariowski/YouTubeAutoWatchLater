@@ -7,7 +7,7 @@ using YouTubeAutoWatchLater.Application.Handlers;
 
 namespace YouTubeAutoWatchLater.Azure;
 
-public class YouTubeAutoWatchLater
+public sealed class YouTubeAutoWatchLater
 {
     private readonly IMediator _mediator;
 

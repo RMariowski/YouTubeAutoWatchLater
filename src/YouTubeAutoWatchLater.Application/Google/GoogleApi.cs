@@ -11,7 +11,7 @@ using YouTubeAutoWatchLater.Application.Google.Options;
 
 namespace YouTubeAutoWatchLater.Application.Google;
 
-public class GoogleApi : IGoogleApi
+public sealed class GoogleApi : IGoogleApi
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly GoogleOptions _options;

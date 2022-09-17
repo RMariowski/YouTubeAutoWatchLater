@@ -1,6 +1,6 @@
 ﻿namespace YouTubeAutoWatchLater.Core.Models;
 
-public record PlaylistItemId(string Value)
+public sealed record PlaylistItemId(string Value)
 {
     public string Value { get; } = IsValid(Value) ? Value : throw new ApplicationException("Invalid playlist item id");
 

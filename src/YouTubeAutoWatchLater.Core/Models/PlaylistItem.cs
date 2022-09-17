@@ -1,3 +1,3 @@
 ﻿namespace YouTubeAutoWatchLater.Core.Models;
 
-public record PlaylistItem(PlaylistItemId Id);
+public sealed record PlaylistItem(PlaylistItemId Id);

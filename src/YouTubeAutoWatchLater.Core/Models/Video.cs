@@ -1,6 +1,6 @@
 ﻿namespace YouTubeAutoWatchLater.Core.Models;
 
-public record Video
+public sealed  record Video
 (
     VideoId Id,
     string Kind,

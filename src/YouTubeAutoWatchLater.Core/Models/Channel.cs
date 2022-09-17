@@ -1,6 +1,6 @@
 ﻿namespace YouTubeAutoWatchLater.Core.Models;
 
-public record Channel(ChannelId Id, string Name)
+public sealed record Channel(ChannelId Id, string Name)
 {
     public PlaylistId? UploadsPlaylist { get; set; }
     public IReadOnlyList<Video>? RecentVideos { get; set; }

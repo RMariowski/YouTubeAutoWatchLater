@@ -6,11 +6,11 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.Handlers;
 
-public class DeletePrivatePlaylistItems
+public sealed class DeletePrivatePlaylistItems
 {
-    public record Command : IRequest;
+    public sealed record Command : IRequest;
 
-    public class Handler : IRequestHandler<Command>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IPlaylistItemRepository _playlistItemRepository;
         private readonly YouTubeOptions _options;

@@ -8,11 +8,11 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.Handlers;
 
-public class UpdateAutoWatchLater
+public sealed class UpdateAutoWatchLater
 {
-    public record Command : IRequest;
+    public sealed record Command : IRequest;
 
-    public class Handler : IRequestHandler<Command>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly IChannelRepository _channelRepository;

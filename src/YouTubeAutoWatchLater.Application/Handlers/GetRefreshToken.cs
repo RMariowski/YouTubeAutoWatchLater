@@ -4,11 +4,11 @@ using YouTubeAutoWatchLater.Application.Google;
 
 namespace YouTubeAutoWatchLater.Application.Handlers;
 
-public class GetRefreshToken
+public sealed  class GetRefreshToken
 {
-    public record Query : IRequest<string>;
+    public sealed record Query : IRequest<string>;
 
-    public class Handler : IRequestHandler<Query, string>
+    public sealed class Handler : IRequestHandler<Query, string>
     {
         private readonly IGoogleApi _googleApi;
         private readonly ILogger<Handler> _logger;
