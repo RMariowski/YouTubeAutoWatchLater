@@ -1,18 +1,21 @@
 ﻿using Google.Apis.YouTube.v3;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Application.Google;
+using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Application.YouTube.Repositories;
 using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.YouTube.Extensions;
+namespace YouTubeAutoWatchLater.Application.YouTube;
 
-public static class ServiceCollectionExtensions
+public static class Extensions
 {
-    public static IServiceCollection AddYouTube(this IServiceCollection services)
+    public static IServiceCollection AddYouTube(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<YouTubeOptions>().Bind(configuration.GetSection("YouTube"));
+
         return services
-            .AddSingleton<IGoogleApi, GoogleApi>()
             .AddSingleton(CreateYouTubeService)
             .AddSingleton<ISubscriptionRepository, YouTubeSubscriptionRepository>()
             .AddSingleton<IChannelRepository, YouTubeChannelRepository>()
@@ -26,7 +29,7 @@ public static class ServiceCollectionExtensions
         var logger = serviceProvider.GetRequiredService<ILogger<YouTubeService>>();
 
         logger.LogInformation("Getting access token");
-        string accessToken = googleApi.GetAccessToken().GetAwaiter().GetResult();
+        var accessToken = googleApi.GetAccessToken().GetAwaiter().GetResult();
         logger.LogInformation("Finished getting access token");
 
         logger.LogInformation("Creating YouTube Service");

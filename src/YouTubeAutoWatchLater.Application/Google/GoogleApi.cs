@@ -5,21 +5,22 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.YouTube.v3;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using YouTubeAutoWatchLater.Application.Settings;
+using YouTubeAutoWatchLater.Application.Google.Options;
 
 namespace YouTubeAutoWatchLater.Application.Google;
 
 public class GoogleApi : IGoogleApi
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ISettings _settings;
+    private readonly GoogleOptions _options;
     private readonly ILogger<GoogleApi> _logger;
 
-    public GoogleApi(IHttpClientFactory httpClientFactory, ISettings settings, ILogger<GoogleApi> logger)
+    public GoogleApi(IHttpClientFactory httpClientFactory, IOptions<GoogleOptions> options, ILogger<GoogleApi> logger)
     {
         _httpClientFactory = httpClientFactory;
-        _settings = settings;
+        _options = options.Value;
         _logger = logger;
     }
 
@@ -41,7 +42,7 @@ public class GoogleApi : IGoogleApi
             {
                 new("client_id", secrets.ClientId),
                 new("client_secret", secrets.ClientSecret),
-                new("refresh_token", _settings.RefreshToken),
+                new("refresh_token", _options.RefreshToken),
                 new("grant_type", "refresh_token")
             })
         };
@@ -52,7 +53,7 @@ public class GoogleApi : IGoogleApi
 
         if (response.IsSuccessStatusCode is false)
         {
-            string reason = await response.Content.ReadAsStringAsync();
+            var reason = await response.Content.ReadAsStringAsync();
             throw new ApplicationException($"Failed to get access token. Reason: {reason}");
         }
 
@@ -81,9 +82,9 @@ public class GoogleApi : IGoogleApi
         const string clientSecretsFileName = "client_secrets.json";
 
         _logger.LogInformation($"Creating path of {clientSecretsFileName}");
-        string binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-        string rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
-        string clientSecretsFilePath = Path.Combine(rootDirectory, clientSecretsFileName);
+        var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        var rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
+        var clientSecretsFilePath = Path.Combine(rootDirectory, clientSecretsFileName);
         _logger.LogInformation($"Created path: {clientSecretsFilePath}");
 
         _logger.LogInformation($"Reading {clientSecretsFilePath} file");

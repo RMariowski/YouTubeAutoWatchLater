@@ -1,5 +1,6 @@
 ﻿using MediatR;
-using YouTubeAutoWatchLater.Application.Settings;
+using Microsoft.Extensions.Options;
+using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
@@ -12,18 +13,18 @@ public class DeletePrivatePlaylistItems
     public class Handler : IRequestHandler<Command>
     {
         private readonly IPlaylistItemRepository _playlistItemRepository;
-        private readonly ISettings _settings;
+        private readonly YouTubeOptions _options;
 
         public Handler(IPlaylistItemRepository playlistItemRepository,
-            ISettings settings)
+            IOptions<YouTubeOptions> options)
         {
             _playlistItemRepository = playlistItemRepository;
-            _settings = settings;
+            _options = options.Value;
         }
 
         public async Task<Unit> Handle(Command command, CancellationToken cancellationToken)
         {
-            await _playlistItemRepository.DeletePrivatePlaylistItemsOfPlaylist(new PlaylistId(_settings.PlaylistId));
+            await _playlistItemRepository.DeletePrivatePlaylistItemsOfPlaylist(new PlaylistId(_options.PlaylistId));
             return Unit.Value;
         }
     }

@@ -5,7 +5,7 @@ using YouTubeAutoWatchLater.Application.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure.Repositories;
 
-public class ConfigurationTableStorageRepository : IConfigurationRepository
+public sealed class ConfigurationTableStorageRepository : IConfigurationRepository
 {
     private const string TableName = "Configurations";
     private const string ValuePropKey = "Value";
@@ -15,7 +15,7 @@ public class ConfigurationTableStorageRepository : IConfigurationRepository
 
     public ConfigurationTableStorageRepository()
     {
-        string storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")!;
+        var storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage")!;
         _tableClient = new TableClient(storageConnectionString, TableName);
         _tableClient.CreateIfNotExists();
     }
@@ -35,7 +35,7 @@ public class ConfigurationTableStorageRepository : IConfigurationRepository
                 throw;
         }
 
-        string? lastSuccessfulExecutionAsString = entityResponse?.Value.GetString(ValuePropKey);
+        var lastSuccessfulExecutionAsString = entityResponse?.Value.GetString(ValuePropKey);
         if (string.IsNullOrWhiteSpace(lastSuccessfulExecutionAsString))
             return DateTime.UtcNow;
 
@@ -45,7 +45,7 @@ public class ConfigurationTableStorageRepository : IConfigurationRepository
 
     public async Task SetLastSuccessfulExecutionDateTimeToNow()
     {
-        var entity = new TableEntity(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey)
+        TableEntity entity = new(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey)
         {
             [ValuePropKey] = DateTimeOffset.UtcNow.ToString("o")
         };

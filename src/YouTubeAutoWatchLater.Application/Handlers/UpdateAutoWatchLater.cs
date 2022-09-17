@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using YouTubeAutoWatchLater.Application.Repositories;
-using YouTubeAutoWatchLater.Application.Settings;
+using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
@@ -17,18 +18,18 @@ public class UpdateAutoWatchLater
         private readonly IChannelRepository _channelRepository;
         private readonly IPlaylistItemRepository _playlistItemRepository;
         private readonly IConfigurationRepository _configurationRepository;
-        private readonly ISettings _settings;
+        private readonly YouTubeOptions _options;
         private readonly ILogger<Handler> _logger;
 
         public Handler(ISubscriptionRepository subscriptionRepository, IChannelRepository channelRepository,
             IPlaylistItemRepository playlistItemRepository, IConfigurationRepository configurationRepository,
-            ISettings settings, ILogger<Handler> logger)
+            IOptions<YouTubeOptions> options, ILogger<Handler> logger)
         {
             _subscriptionRepository = subscriptionRepository;
             _channelRepository = channelRepository;
             _playlistItemRepository = playlistItemRepository;
             _configurationRepository = configurationRepository;
-            _settings = settings;
+            _options = options.Value;
             _logger = logger;
         }
 
@@ -88,7 +89,7 @@ public class UpdateAutoWatchLater
 
             _logger.LogInformation("Adding recent videos to playlist");
 
-            PlaylistId playlistId = new(_settings.PlaylistId);
+            PlaylistId playlistId = new(_options.PlaylistId);
             foreach (var video in recentVideos)
             {
                 _logger.LogInformation($"Adding {video} to playlist");
