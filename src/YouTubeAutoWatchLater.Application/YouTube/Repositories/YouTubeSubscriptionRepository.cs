@@ -17,13 +17,13 @@ public sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
     {
         Subscriptions youTubeSubscriptions = new();
 
-        var nextPageToken = string.Empty;
+        var pageToken = string.Empty;
         do
         {
             var subscriptionsListRequest = _youTubeService.Subscriptions.List("snippet");
             subscriptionsListRequest.MaxResults = Consts.MaxResults;
             subscriptionsListRequest.Mine = true;
-            subscriptionsListRequest.PageToken = nextPageToken;
+            subscriptionsListRequest.PageToken = pageToken;
             var subscriptionsListResponse = await subscriptionsListRequest.ExecuteAsync();
 
             var subscriptions = subscriptionsListResponse.Items
@@ -36,8 +36,8 @@ public sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
             foreach (var subscription in subscriptions)
                 youTubeSubscriptions.Add(subscription.Id, subscription);
 
-            nextPageToken = subscriptionsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(nextPageToken));
+            pageToken = subscriptionsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(pageToken));
 
         return youTubeSubscriptions;
     }

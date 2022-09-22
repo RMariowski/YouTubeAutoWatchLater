@@ -45,12 +45,13 @@ public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 
         List<Video> recentVideos = new();
 
-        string nextPageToken;
+        var pageToken = string.Empty;
         do
         {
             var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
             playlistItemsListRequest.PlaylistId = playlistId.Value;
             playlistItemsListRequest.MaxResults = fetchCount;
+            playlistItemsListRequest.PageToken = pageToken;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
@@ -73,8 +74,8 @@ public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
             if (videosNewerThanSpecifiedDateTime.Length < fetchCount)
                 break;
 
-            nextPageToken = playlistItemsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(nextPageToken));
+            pageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(pageToken));
 
         return recentVideos;
     }
@@ -85,12 +86,13 @@ public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 
         List<PlaylistItem> playlistItems = new();
 
-        string nextPageToken;
+        var pageToken = string.Empty;
         do
         {
             var playlistItemsListRequest = _youTubeService.PlaylistItems.List("id,status");
             playlistItemsListRequest.PlaylistId = playlistId.Value;
             playlistItemsListRequest.MaxResults = Consts.MaxResults;
+            playlistItemsListRequest.PageToken = pageToken;
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var privatePlaylistItems = playlistItemsListResponse.Items
@@ -98,8 +100,8 @@ public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
                 .Select(item => new PlaylistItem(new PlaylistItemId(item.Id)));
             playlistItems.AddRange(privatePlaylistItems);
 
-            nextPageToken = playlistItemsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(nextPageToken));
+            pageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(pageToken));
 
         _logger.LogInformation($"Finished getting private playlist items from playlist {playlistId}");
 
