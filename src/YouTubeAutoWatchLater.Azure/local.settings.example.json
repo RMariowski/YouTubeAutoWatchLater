@@ -6,6 +6,10 @@
         "Cron": "0 */1 * * * *",
         "DeletePrivatePlaylistItemsCron": "0 */2 * * * *",
         "Google:RefreshToken": "",
-        "YouTube:PlaylistId": ""
+        "YouTube:PlaylistId": "",
+        "YouTube:PlaylistRules:0:Channels": "ChannelName1,ChannelName2",
+        "YouTube:PlaylistRules:0:PlaylistId": "",
+        "YouTube:PlaylistRules:1:TitleKeywords": "Game,Fun",
+        "YouTube:PlaylistRules:1:PlaylistId": ""
     }
 }
