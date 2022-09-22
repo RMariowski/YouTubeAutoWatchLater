@@ -56,7 +56,7 @@ internal sealed class PlaylistRuleResolver : IPlaylistRuleResolver
                 match = _channelNames.Contains(video.ChannelTitle.ToLowerInvariant());
 
             if (match is null or true && _titleKeywords.Count > 0)
-                match = _titleKeywords.Contains(video.Title);
+                match = _titleKeywords.Any(keyword => video.Title.Contains(keyword));
 
             return match.HasValue && match.Value;
         }
