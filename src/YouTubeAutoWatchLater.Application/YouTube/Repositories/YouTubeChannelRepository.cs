@@ -16,29 +16,32 @@ internal sealed class YouTubeChannelRepository : IChannelRepository
         _logger = logger;
     }
 
-    public async Task SetUploadsPlaylistForSubscriptions(Subscriptions subscriptions)
+    public async Task<IReadOnlyDictionary<ChannelId, PlaylistId>> GetUploadsPlaylists(IEnumerable<ChannelId> channelIds)
     {
-        var chunks = subscriptions.Chunk(Consts.MaxResults).ToArray();
+        Dictionary<ChannelId, PlaylistId> result = new();
+
+        var chunks = channelIds.Chunk(Consts.MaxResults).ToArray();
         for (var i = 0; i < chunks.Length; i++)
         {
-            var chunkedSubscriptions = chunks[i];
+            var chunkedChannelIds = chunks[i];
 
             _logger.LogInformation($"Getting channels of subscriptions chunk {i + 1}/{chunks.Length}");
 
             var channelsListRequest = _youTubeService.Channels.List("contentDetails");
-            channelsListRequest.Id = chunkedSubscriptions.Select(subscription => subscription.Key.Value).ToArray();
-            channelsListRequest.MaxResults = chunkedSubscriptions.Length;
+            channelsListRequest.Id = chunkedChannelIds.Select(id => id.Value).ToArray();
+            channelsListRequest.MaxResults = chunkedChannelIds.Length;
             var channelListResponse = await channelsListRequest.ExecuteAsync();
-            var channelsOfSubscriptions = channelListResponse.Items;
 
             _logger.LogInformation($"Finished getting channels of subscriptions chunk {i + 1}/{chunks.Length}");
 
-            foreach (var channel in channelsOfSubscriptions)
+            foreach (var channel in channelListResponse.Items)
             {
                 ChannelId channelId = new(channel.Id);
                 PlaylistId playlist = new(channel.ContentDetails.RelatedPlaylists.Uploads);
-                subscriptions[channelId].UploadsPlaylist = playlist;
+                result.Add(channelId, playlist);
             }
         }
+
+        return result;
     }
 }

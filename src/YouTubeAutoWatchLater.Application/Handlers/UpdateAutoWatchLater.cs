@@ -39,7 +39,7 @@ public sealed class UpdateAutoWatchLater
             _logger.LogInformation("Finished getting subscriptions");
 
             _logger.LogInformation("Setting uploads playlist for subscriptions");
-            await _channelRepository.SetUploadsPlaylistForSubscriptions(subscriptions);
+            await SetUploadsPlaylists(subscriptions);
             _logger.LogInformation("Finished setting uploads playlist for subscriptions");
 
             _logger.LogInformation("Getting last successful execution date time");
@@ -58,6 +58,15 @@ public sealed class UpdateAutoWatchLater
             _logger.LogInformation("Finished setting last successful execution date time");
 
             return Unit.Value;
+        }
+
+        private async Task SetUploadsPlaylists(Subscriptions subscriptions)
+        {
+            var channelIds = subscriptions.Select(subscription => subscription.Key).ToArray();
+            var uploadsPlaylists = await _channelRepository.GetUploadsPlaylists(channelIds);
+
+            foreach (var uploadsPlaylist in uploadsPlaylists)
+                subscriptions[uploadsPlaylist.Key].UploadsPlaylist = uploadsPlaylist.Value;
         }
 
         private async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime)
@@ -91,7 +100,7 @@ public sealed class UpdateAutoWatchLater
             foreach (var video in recentVideos)
             {
                 var playlistId = _playlistRuleResolver.Resolve(video);
-                
+
                 _logger.LogInformation($"Adding {video} to playlist {playlistId}");
                 await _playlistItemRepository.AddToPlaylist(playlistId, video);
                 _logger.LogInformation($"Finished video {video} to playlist {playlistId}");
