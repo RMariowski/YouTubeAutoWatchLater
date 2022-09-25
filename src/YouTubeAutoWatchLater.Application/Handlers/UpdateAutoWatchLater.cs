@@ -34,43 +34,55 @@ public sealed class UpdateAutoWatchLater
 
         public async Task<Unit> Handle(Command command, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting subscriptions");
-            var subscriptions = await _subscriptionRepository.GetMySubscriptions();
-            _logger.LogInformation("Finished getting subscriptions");
-
-            _logger.LogInformation("Setting uploads playlist for subscriptions");
+            var subscriptions = await GetSubscriptions();
             await SetUploadsPlaylists(subscriptions);
-            _logger.LogInformation("Finished setting uploads playlist for subscriptions");
 
-            _logger.LogInformation("Getting last successful execution date time");
-            var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
-            _logger.LogInformation(
-                $"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime:o} UTC");
+            var lastSuccessfulExecutionDateTime = await GetLastSuccessfulExecutionDateTime();
 
-            _logger.LogInformation("Setting recent videos of subscriptions");
             await SetRecentVideosForSubscriptions(subscriptions, lastSuccessfulExecutionDateTime);
-            _logger.LogInformation("Finished setting recent videos of subscriptions");
-
             await AddRecentVideosToPlaylist(subscriptions);
 
-            _logger.LogInformation("Setting last successful execution date time");
-            await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
-            _logger.LogInformation("Finished setting last successful execution date time");
+            await SetLastSuccessfulExecutionDateTimeToNow();
 
             return Unit.Value;
         }
 
+        private async Task<Subscriptions> GetSubscriptions()
+        {
+            _logger.LogInformation("Getting subscriptions");
+            var subscriptions = await _subscriptionRepository.GetMySubscriptions();
+            _logger.LogInformation("Finished getting subscriptions");
+
+            return subscriptions;
+        }
+
         private async Task SetUploadsPlaylists(Subscriptions subscriptions)
         {
+            _logger.LogInformation("Setting uploads playlist for subscriptions");
+
             var channelIds = subscriptions.Select(subscription => subscription.Key).ToArray();
             var uploadsPlaylists = await _channelRepository.GetUploadsPlaylists(channelIds);
 
             foreach (var uploadsPlaylist in uploadsPlaylists)
                 subscriptions[uploadsPlaylist.Key].UploadsPlaylist = uploadsPlaylist.Value;
+
+            _logger.LogInformation("Finished setting uploads playlist for subscriptions");
+        }
+
+        private async Task<DateTime> GetLastSuccessfulExecutionDateTime()
+        {
+            _logger.LogInformation("Getting last successful execution date time");
+            var lastSuccessfulExecutionDateTime = await _configurationRepository.GetLastSuccessfulExecutionDateTime();
+            _logger.LogInformation(
+                $"Finished getting last successful execution date time: {lastSuccessfulExecutionDateTime:o} UTC");
+
+            return lastSuccessfulExecutionDateTime;
         }
 
         private async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime)
         {
+            _logger.LogInformation("Setting recent videos of subscriptions");
+
             ParallelOptions options = new() { MaxDegreeOfParallelism = 10 };
 
             await Parallel.ForEachAsync(subscriptions.Values, options, async (channel, _) =>
@@ -81,6 +93,8 @@ public sealed class UpdateAutoWatchLater
 
                 channel.RecentVideos = recentVideos;
             });
+
+            _logger.LogInformation("Finished setting recent videos of subscriptions");
         }
 
         private async Task AddRecentVideosToPlaylist(Subscriptions subscriptions)
@@ -109,6 +123,13 @@ public sealed class UpdateAutoWatchLater
             }
 
             _logger.LogInformation("Finished adding recent videos to playlist");
+        }
+
+        private async Task SetLastSuccessfulExecutionDateTimeToNow()
+        {
+            _logger.LogInformation("Setting last successful execution date time");
+            await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNow();
+            _logger.LogInformation("Finished setting last successful execution date time");
         }
     }
 }
