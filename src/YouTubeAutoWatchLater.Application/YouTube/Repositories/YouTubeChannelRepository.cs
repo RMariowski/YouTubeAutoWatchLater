@@ -5,7 +5,7 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
 
-public sealed class YouTubeChannelRepository : IChannelRepository
+internal sealed class YouTubeChannelRepository : IChannelRepository
 {
     private readonly YouTubeService _youTubeService;
     private readonly ILogger<YouTubeChannelRepository> _logger;

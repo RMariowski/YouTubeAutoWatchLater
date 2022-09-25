@@ -4,7 +4,7 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
 
-public sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
+internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
 {
     private readonly YouTubeService _youTubeService;
 

@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using YouTubeAutoWatchLater.Application.Repositories;
-using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Application.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;

@@ -9,7 +9,7 @@ using Video = YouTubeAutoWatchLater.Core.Models.Video;
 
 namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
 
-public sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
+internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 {
     private readonly YouTubeService _youTubeService;
     private readonly ILogger<YouTubePlaylistItemRepository> _logger;
