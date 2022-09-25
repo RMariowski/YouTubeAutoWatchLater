@@ -71,14 +71,14 @@ public sealed class UpdateAutoWatchLater
 
         private async Task SetRecentVideosForSubscriptions(Subscriptions subscriptions, DateTimeOffset dateTime)
         {
-            foreach (var (_, channel) in subscriptions)
+            await Parallel.ForEachAsync(subscriptions.Values, async (channel, _) =>
             {
                 _logger.LogInformation($"Getting uploads playlist items of {channel}");
                 var recentVideos = await _playlistItemRepository.GetRecentVideos(channel.UploadsPlaylist!, dateTime);
                 _logger.LogInformation($"Finished getting uploads playlist items of {channel}");
 
                 channel.RecentVideos = recentVideos;
-            }
+            });
         }
 
         private async Task AddRecentVideosToPlaylist(Subscriptions subscriptions)
