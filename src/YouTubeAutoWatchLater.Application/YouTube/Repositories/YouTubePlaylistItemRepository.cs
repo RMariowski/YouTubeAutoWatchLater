@@ -35,8 +35,43 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
                 }
             }
         };
-        var playlistItemsInsertRequest = _youTubeService.PlaylistItems.Insert(playlistItem, "snippet");
-        await playlistItemsInsertRequest.ExecuteAsync();
+
+        await _youTubeService.PlaylistItems.Insert(playlistItem, "snippet").ExecuteAsync();
+    }
+
+    public async Task<IReadOnlyList<Video>> GetVideos(PlaylistId playlistId, DateTimeOffset since)
+    {
+        List<Video> recentVideos = new();
+
+        var pageToken = string.Empty;
+        do
+        {
+            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
+            playlistItemsListRequest.PlaylistId = playlistId.Value;
+            playlistItemsListRequest.MaxResults = Consts.MaxResults;
+            playlistItemsListRequest.PageToken = pageToken;
+            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+
+            var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
+                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > since ||
+                                       playlistItem.Snippet.PublishedAt > since)
+                .Select(playlistItem => new Video
+                (
+                    new VideoId(playlistItem.Snippet.ResourceId.VideoId),
+                    playlistItem.Snippet.ResourceId.Kind,
+                    playlistItem.Snippet.Title,
+                    playlistItem.Snippet.ChannelTitle,
+                    playlistItem.ContentDetails.VideoPublishedAt!.Value,
+                    playlistItem.Snippet.PublishedAt!.Value
+                ))
+                .ToArray();
+
+            recentVideos.AddRange(videosNewerThanSpecifiedDateTime);
+
+            pageToken = playlistItemsListResponse.NextPageToken;
+        } while (!string.IsNullOrEmpty(pageToken));
+
+        return recentVideos;
     }
 
     public async Task<IReadOnlyList<Video>> GetRecentVideos(PlaylistId playlistId, DateTimeOffset dateTime)

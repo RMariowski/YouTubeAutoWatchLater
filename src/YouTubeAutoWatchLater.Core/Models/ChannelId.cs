@@ -6,4 +6,6 @@ public sealed record ChannelId(string Value)
 
     public static bool IsValid(string value)
         => !string.IsNullOrWhiteSpace(value);
+
+    public override string ToString() => Value;
 }

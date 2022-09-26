@@ -7,10 +7,12 @@ public interface IPlaylistItemRepository
 {
     Task AddToPlaylist(PlaylistId playlistId, Video video);
 
+    Task<IReadOnlyList<Video>> GetVideos(PlaylistId playlistId, DateTimeOffset since);
+
     Task<IReadOnlyList<Video>> GetRecentVideos(PlaylistId playlistId, DateTimeOffset dateTime);
-    
+
     Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(PlaylistId playlistId);
-    
+
     Task DeletePlaylistItem(PlaylistItemId id);
 
     Task DeletePrivatePlaylistItemsOfPlaylist(PlaylistId playlistId);

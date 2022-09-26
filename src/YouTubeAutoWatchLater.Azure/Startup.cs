@@ -17,6 +17,7 @@ public sealed  class Startup : FunctionsStartup
 
         builder.Services
             .AddApplication(configuration)
-            .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>();
+            .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>()
+            .AddSingleton<IAutoAddedVideosRepository, AutoAddedVideosTableStorageRepository>();
     }
 }

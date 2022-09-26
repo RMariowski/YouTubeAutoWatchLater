@@ -9,7 +9,8 @@ public sealed class ConfigurationTableStorageRepository : IConfigurationReposito
 {
     private const string TableName = "Configurations";
     private const string ValuePropKey = "Value";
-    private readonly (string PartitionKey, string RowKey) _lastSuccessfulRun = ("General", "LastSuccessfulRun");
+    private const string GeneralPartitionKey = "General";
+    private const string LastSuccessfulRun = nameof(LastSuccessfulRun);
 
     private readonly TableClient _tableClient;
 
@@ -26,8 +27,7 @@ public sealed class ConfigurationTableStorageRepository : IConfigurationReposito
 
         try
         {
-            entityResponse = await _tableClient.GetEntityAsync<TableEntity>(
-                _lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey);
+            entityResponse = await _tableClient.GetEntityAsync<TableEntity>(GeneralPartitionKey, LastSuccessfulRun);
         }
         catch (RequestFailedException e)
         {
@@ -36,16 +36,14 @@ public sealed class ConfigurationTableStorageRepository : IConfigurationReposito
         }
 
         var lastSuccessfulExecutionAsString = entityResponse?.Value.GetString(ValuePropKey);
-        if (string.IsNullOrWhiteSpace(lastSuccessfulExecutionAsString))
-            return DateTime.UtcNow;
-
-        var lastSuccessfulExecution = DateTimeOffset.Parse(lastSuccessfulExecutionAsString);
-        return lastSuccessfulExecution.UtcDateTime;
+        return string.IsNullOrWhiteSpace(lastSuccessfulExecutionAsString)
+            ? DateTime.UtcNow
+            : DateTimeOffset.Parse(lastSuccessfulExecutionAsString).UtcDateTime;
     }
 
     public async Task SetLastSuccessfulExecutionDateTimeToNow()
     {
-        TableEntity entity = new(_lastSuccessfulRun.PartitionKey, _lastSuccessfulRun.RowKey)
+        TableEntity entity = new(GeneralPartitionKey, LastSuccessfulRun)
         {
             [ValuePropKey] = DateTimeOffset.UtcNow.ToString("o")
         };
