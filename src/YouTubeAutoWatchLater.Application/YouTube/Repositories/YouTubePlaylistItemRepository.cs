@@ -74,47 +74,6 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         return recentVideos;
     }
 
-    public async Task<IReadOnlyList<Video>> GetRecentVideos(PlaylistId playlistId, DateTimeOffset dateTime)
-    {
-        const int fetchCount = 10;
-
-        List<Video> recentVideos = new();
-
-        var pageToken = string.Empty;
-        do
-        {
-            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
-            playlistItemsListRequest.PlaylistId = playlistId.Value;
-            playlistItemsListRequest.MaxResults = fetchCount;
-            playlistItemsListRequest.PageToken = pageToken;
-            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
-
-            var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
-                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > dateTime ||
-                                       playlistItem.Snippet.PublishedAt > dateTime)
-                .Select(playlistItem => new Video
-                (
-                    new VideoId(playlistItem.Snippet.ResourceId.VideoId),
-                    playlistItem.Snippet.ResourceId.Kind,
-                    playlistItem.Snippet.Title,
-                    playlistItem.Snippet.ChannelTitle,
-                    playlistItem.ContentDetails.VideoPublishedAt!.Value,
-                    playlistItem.Snippet.PublishedAt!.Value
-                ))
-                .ToArray();
-
-            if (videosNewerThanSpecifiedDateTime.Length > 0)
-                recentVideos.AddRange(videosNewerThanSpecifiedDateTime);
-
-            if (videosNewerThanSpecifiedDateTime.Length < fetchCount)
-                break;
-
-            pageToken = playlistItemsListResponse.NextPageToken;
-        } while (!string.IsNullOrEmpty(pageToken));
-
-        return recentVideos;
-    }
-
     public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(PlaylistId playlistId)
     {
         _logger.LogInformation($"Getting private playlist items from playlist {playlistId}");
@@ -149,15 +108,5 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         var playlistItemsDeleteRequest = _youTubeService.PlaylistItems.Delete(id.Value);
         _ = await playlistItemsDeleteRequest.ExecuteAsync();
         _logger.LogInformation($"Finished deleting playlist item {id}");
-    }
-
-    public async Task DeletePrivatePlaylistItemsOfPlaylist(PlaylistId playlistId)
-    {
-        var playlistItems = await GetPrivatePlaylistItemsOfPlaylist(playlistId);
-        var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
-        _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
-
-        foreach (var playlistItemId in playlistItemIds)
-            await DeletePlaylistItem(playlistItemId);
     }
 }
