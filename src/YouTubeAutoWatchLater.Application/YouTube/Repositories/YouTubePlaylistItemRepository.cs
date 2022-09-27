@@ -68,6 +68,9 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 
             recentVideos.AddRange(videosNewerThanSpecifiedDateTime);
 
+            if (videosNewerThanSpecifiedDateTime.Length == 0)
+                break;
+
             pageToken = playlistItemsListResponse.NextPageToken;
         } while (!string.IsNullOrEmpty(pageToken));
 
