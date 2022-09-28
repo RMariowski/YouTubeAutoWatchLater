@@ -44,9 +44,10 @@ public sealed class UpdateAutoWatchLater
             var dateTime = DateTimeOffset.UtcNow.AddDays(-20);
             var videosToAdd = await GetNewVideosOfSubscriptions(subscriptions, dateTime);
             await AddNewVideosToSubscriptionsPlaylists(videosToAdd.Values.SelectMany(videos => videos).ToArray());
-            await UpdateAutoAddedVideos(videosToAdd, dateTime);
+            await UpdateAutoAddedVideos(videosToAdd);
 
             await SetLastSuccessfulExecutionDateTimeToNow();
+
             return Unit.Value;
         }
 
@@ -122,14 +123,9 @@ public sealed class UpdateAutoWatchLater
             _logger.LogInformation("Finished adding recent videos to playlist");
         }
 
-        private async Task UpdateAutoAddedVideos(ConcurrentDictionary<ChannelId, Video[]> videosToAdd,
-            DateTimeOffset dateTime)
+        private async Task UpdateAutoAddedVideos(ConcurrentDictionary<ChannelId, Video[]> videosToAdd)
         {
             _logger.LogInformation("Updating auto added videos");
-
-            _logger.LogInformation($"Deleting auto added videos older than {dateTime:yyyy-MM-ddTHH:mm}");
-            await _autoAddedVideosRepository.DeleteOlderThan(dateTime);
-            _logger.LogInformation($"Finished deleting auto added videos older than {dateTime:yyyy-MM-ddTHH:mm}");
 
             foreach (var (channelId, videos) in videosToAdd)
             {

@@ -3,8 +3,10 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "Cron": "0 */1 * * * *",
-        "DeletePrivatePlaylistItemsCron": "0 */2 * * * *",
+        "Cron": "0 */5 * * * *",
+        "DeleteAutoAddedVideos:Cron": "0 12 * * * *",
+        "DeleteAutoAddedVideos:OlderThanDays": 20,
+        "DeletePrivatePlaylistItems:Cron": "0 12 * * * *",
         "Google:RefreshToken": "",
         "YouTube:PlaylistId": "",
         "YouTube:PlaylistRules:0:Channels": "ChannelName1,ChannelName2",

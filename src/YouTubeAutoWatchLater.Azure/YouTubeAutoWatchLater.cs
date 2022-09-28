@@ -31,9 +31,23 @@ public sealed class YouTubeAutoWatchLater
     }
 
     [Singleton]
+    [FunctionName(nameof(DeleteAutoAddedVideos))]
+    public async Task DeleteAutoAddedVideos(
+        [TimerTrigger("%DeleteAutoAddedVideos:Cron%"
+#if DEBUG
+            , RunOnStartup = true
+#endif
+        )]
+        TimerInfo timerInfo)
+    {
+        DeleteAutoAddedVideos.Command command = new();
+        await _mediator.Send(command);
+    }
+    
+    [Singleton]
     [FunctionName(nameof(DeletePrivatePlaylistItems))]
     public async Task DeletePrivatePlaylistItems(
-        [TimerTrigger("%DeletePrivatePlaylistItemsCron%"
+        [TimerTrigger("%DeletePrivatePlaylistItems:Cron%"
 #if DEBUG
             , RunOnStartup = true
 #endif
