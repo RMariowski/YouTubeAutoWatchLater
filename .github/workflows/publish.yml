@@ -9,7 +9,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: rm-yt-auto-watch-later
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
-  DOTNET_VERSION: '6.0.x'
+  DOTNET_VERSION: '7.0.x'
 
 
 jobs:

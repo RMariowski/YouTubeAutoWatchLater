@@ -83,8 +83,7 @@ internal sealed class GoogleApi : IGoogleApi
 
         _logger.LogInformation($"Creating path of {clientSecretsFileName}");
         var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-        var rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
-        var clientSecretsFilePath = Path.Combine(rootDirectory, clientSecretsFileName);
+        var clientSecretsFilePath = Path.Combine(binDirectory, clientSecretsFileName);
         _logger.LogInformation($"Created path: {clientSecretsFilePath}");
 
         _logger.LogInformation($"Reading {clientSecretsFilePath} file");

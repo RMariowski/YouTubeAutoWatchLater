@@ -1,8 +1,7 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+﻿using System.Net;
+using MediatR;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using YouTubeAutoWatchLater.Application.Handlers;
 
 namespace YouTubeAutoWatchLater.Azure;
@@ -16,8 +15,7 @@ public sealed class YouTubeAutoWatchLater
         _mediator = mediator;
     }
 
-    [Singleton]
-    [FunctionName(nameof(Run))]
+    [Function(nameof(Run))]
     public async Task Run(
         [TimerTrigger("%Cron%"
 #if DEBUG
@@ -30,8 +28,7 @@ public sealed class YouTubeAutoWatchLater
         await _mediator.Send(command);
     }
 
-    [Singleton]
-    [FunctionName(nameof(DeleteAutoAddedVideos))]
+    [Function(nameof(DeleteAutoAddedVideos))]
     public async Task DeleteAutoAddedVideos(
         [TimerTrigger("%DeleteAutoAddedVideos:Cron%"
 #if DEBUG
@@ -43,9 +40,8 @@ public sealed class YouTubeAutoWatchLater
         DeleteAutoAddedVideos.Command command = new();
         await _mediator.Send(command);
     }
-    
-    [Singleton]
-    [FunctionName(nameof(DeletePrivatePlaylistItems))]
+
+    [Function(nameof(DeletePrivatePlaylistItems))]
     public async Task DeletePrivatePlaylistItems(
         [TimerTrigger("%DeletePrivatePlaylistItems:Cron%"
 #if DEBUG
@@ -58,14 +54,16 @@ public sealed class YouTubeAutoWatchLater
         await _mediator.Send(command);
     }
 
-    [Singleton]
-    [FunctionName(nameof(GetRefreshToken))]
-    public async Task<IActionResult> GetRefreshToken(
+    [Function(nameof(GetRefreshToken))]
+    public async Task<HttpResponseData> GetRefreshToken(
         [HttpTrigger(AuthorizationLevel.Function, "get")]
-        HttpRequest request)
+        HttpRequestData request)
     {
         GetRefreshToken.Query query = new();
         var refreshToken = await _mediator.Send(query);
-        return new OkObjectResult(refreshToken);
+
+        var response = request.CreateResponse(HttpStatusCode.OK);
+        await response.WriteStringAsync(refreshToken);
+        return response;
     }
 }
