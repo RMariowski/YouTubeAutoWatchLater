@@ -17,11 +17,11 @@ internal static class Extensions
         services.AddOptions<YouTubeOptions>().Bind(configuration.GetSection("YouTube"));
 
         return services
-            .AddSingleton(CreateYouTubeService)
-            .AddSingleton<ISubscriptionRepository, YouTubeSubscriptionRepository>()
-            .AddSingleton<IChannelRepository, YouTubeChannelRepository>()
-            .AddSingleton<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
-            .AddSingleton<IPlaylistRuleResolver, PlaylistRuleResolver>();
+            .AddScoped(CreateYouTubeService)
+            .AddScoped<ISubscriptionRepository, YouTubeSubscriptionRepository>()
+            .AddScoped<IChannelRepository, YouTubeChannelRepository>()
+            .AddScoped<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
+            .AddScoped<IPlaylistRuleResolver, PlaylistRuleResolver>();
     }
 
     // TODO: Would be good to make it somehow asynchronous

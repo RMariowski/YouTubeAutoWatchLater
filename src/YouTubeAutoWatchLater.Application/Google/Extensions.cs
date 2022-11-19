@@ -9,6 +9,6 @@ internal static class Extensions
     public static IServiceCollection AddGoogle(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<GoogleOptions>().Bind(configuration.GetSection("Google"));
-        return services.AddSingleton<IGoogleApi, GoogleApi>();
+        return services.AddScoped<IGoogleApi, GoogleApi>();
     }
 }

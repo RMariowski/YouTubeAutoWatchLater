@@ -18,8 +18,8 @@ public class Program
 
                 services
                     .AddApplication(configuration)
-                    .AddSingleton<IConfigurationRepository, ConfigurationTableStorageRepository>()
-                    .AddSingleton<IAutoAddedVideosRepository, AutoAddedVideosTableStorageRepository>();
+                    .AddScoped<IConfigurationRepository, ConfigurationTableStorageRepository>()
+                    .AddScoped<IAutoAddedVideosRepository, AutoAddedVideosTableStorageRepository>();
             })
             .Build();
         await host.RunAsync();
