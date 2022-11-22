@@ -1,4 +1,4 @@
-name: Deploy
+name: Publish
 
 on:
   push:
@@ -10,7 +10,6 @@ env:
   AZURE_FUNCTIONAPP_NAME: rm-yt-auto-watch-later
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '7.0.x'
-
 
 jobs:
   build-and-deploy:
