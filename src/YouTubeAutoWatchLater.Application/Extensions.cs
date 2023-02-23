@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YouTubeAutoWatchLater.Application.Google;
 using YouTubeAutoWatchLater.Application.Handlers;
@@ -14,7 +13,7 @@ public static class Extensions
         return services
             .AddLogging()
             .AddHttpClient()
-            .AddMediatR(typeof(UpdateAutoWatchLater.Handler).Assembly)
+            .AddMediatR(mediatr => mediatr.RegisterServicesFromAssembly(typeof(UpdateAutoWatchLater.Handler).Assembly))
             .AddGoogle(configuration)
             .AddYouTube(configuration);
     }

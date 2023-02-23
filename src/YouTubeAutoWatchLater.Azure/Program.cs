@@ -6,7 +6,7 @@ using YouTubeAutoWatchLater.Azure.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure;
 
-public class Program
+internal class Program
 {
     private static async Task Main(string[] args)
     {

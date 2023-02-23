@@ -19,22 +19,20 @@ public class DeleteAutoAddedVideos
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             var olderThanDaysString = Environment.GetEnvironmentVariable("DeleteAutoAddedVideos:OlderThanDays");
             if (string.IsNullOrWhiteSpace(olderThanDaysString))
-                return Unit.Value;
+                return;
 
             if (int.TryParse(olderThanDaysString, out var olderThanDays) is false)
-                return Unit.Value;
+                return;
 
             var dateTime = DateTimeOffset.UtcNow.AddDays(-olderThanDays);
 
             _logger.LogInformation($"Deleting auto added videos older than {dateTime:yyyy-MM-ddTHH:mm}");
             await _autoAddedVideosRepository.DeleteOlderThan(dateTime);
             _logger.LogInformation($"Finished deleting auto added videos older than {dateTime:yyyy-MM-ddTHH:mm}");
-
-            return Unit.Value;
         }
     }
 }

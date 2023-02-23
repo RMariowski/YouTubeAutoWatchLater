@@ -25,7 +25,7 @@ public sealed class DeletePrivatePlaylistItems
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(Command command, CancellationToken cancellationToken)
+        public async Task Handle(Command command, CancellationToken cancellationToken)
         {
             PlaylistId playlistId = new(_options.PlaylistId);
 
@@ -35,8 +35,6 @@ public sealed class DeletePrivatePlaylistItems
 
             foreach (var playlistItemId in playlistItemIds)
                 await _playlistItemRepository.DeletePlaylistItem(playlistItemId);
-
-            return Unit.Value;
         }
     }
 }

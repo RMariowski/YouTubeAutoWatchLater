@@ -17,11 +17,7 @@ public sealed class YouTubeAutoWatchLater
 
     [Function(nameof(Run))]
     public async Task Run(
-        [TimerTrigger("%Cron%"
-#if DEBUG
-            , RunOnStartup = true
-#endif
-        )]
+        [TimerTrigger("%Cron%", RunOnStartup = RunOnStartup.WhenDebug)]
         TimerInfo timerInfo)
     {
         UpdateAutoWatchLater.Command command = new();
@@ -30,11 +26,7 @@ public sealed class YouTubeAutoWatchLater
 
     [Function(nameof(DeleteAutoAddedVideos))]
     public async Task DeleteAutoAddedVideos(
-        [TimerTrigger("%DeleteAutoAddedVideos:Cron%"
-#if DEBUG
-            , RunOnStartup = true
-#endif
-        )]
+        [TimerTrigger("%DeleteAutoAddedVideos:Cron%", RunOnStartup = RunOnStartup.WhenDebug)]
         TimerInfo timerInfo)
     {
         DeleteAutoAddedVideos.Command command = new();
@@ -43,11 +35,7 @@ public sealed class YouTubeAutoWatchLater
 
     [Function(nameof(DeletePrivatePlaylistItems))]
     public async Task DeletePrivatePlaylistItems(
-        [TimerTrigger("%DeletePrivatePlaylistItems:Cron%"
-#if DEBUG
-            , RunOnStartup = true
-#endif
-        )]
+        [TimerTrigger("%DeletePrivatePlaylistItems:Cron%", RunOnStartup = RunOnStartup.WhenDebug)]
         TimerInfo timerInfo)
     {
         DeletePrivatePlaylistItems.Command command = new();

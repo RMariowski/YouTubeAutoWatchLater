@@ -36,7 +36,7 @@ public sealed class UpdateAutoWatchLater
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(Command command, CancellationToken cancellationToken)
+        public async Task Handle(Command command, CancellationToken cancellationToken)
         {
             var subscriptions = await GetSubscriptions();
             await SetUploadsPlaylists(subscriptions);
@@ -47,8 +47,6 @@ public sealed class UpdateAutoWatchLater
             await UpdateAutoAddedVideos(videosToAdd);
 
             await SetLastSuccessfulExecutionDateTimeToNow();
-
-            return Unit.Value;
         }
 
         private async Task<Subscriptions> GetSubscriptions()
