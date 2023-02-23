@@ -1,6 +1,6 @@
 ﻿using YouTubeAutoWatchLater.Core.Models;
 
-namespace YouTubeAutoWatchLater.Application.Repositories;
+namespace YouTubeAutoWatchLater.Core.Repositories;
 
 public interface IAutoAddedVideosRepository
 {

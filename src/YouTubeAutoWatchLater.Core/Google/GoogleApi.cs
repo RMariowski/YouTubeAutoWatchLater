@@ -7,9 +7,8 @@ using Google.Apis.YouTube.v3;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using YouTubeAutoWatchLater.Application.Google.Options;
 
-namespace YouTubeAutoWatchLater.Application.Google;
+namespace YouTubeAutoWatchLater.Core.Google;
 
 internal sealed class GoogleApi : IGoogleApi
 {

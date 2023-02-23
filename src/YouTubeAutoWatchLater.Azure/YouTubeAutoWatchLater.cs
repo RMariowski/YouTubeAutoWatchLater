@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using YouTubeAutoWatchLater.Application.Handlers;
+using YouTubeAutoWatchLater.Core.Handlers;
 
 namespace YouTubeAutoWatchLater.Azure;
 

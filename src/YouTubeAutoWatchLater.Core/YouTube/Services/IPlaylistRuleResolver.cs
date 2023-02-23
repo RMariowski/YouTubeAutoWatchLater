@@ -1,6 +1,6 @@
 ﻿using YouTubeAutoWatchLater.Core.Models;
 
-namespace YouTubeAutoWatchLater.Application.YouTube.Services;
+namespace YouTubeAutoWatchLater.Core.YouTube.Services;
 
 public interface IPlaylistRuleResolver
 {

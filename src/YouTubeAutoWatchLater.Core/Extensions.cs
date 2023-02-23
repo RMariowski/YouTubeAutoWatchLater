@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using YouTubeAutoWatchLater.Application.Google;
-using YouTubeAutoWatchLater.Application.Handlers;
-using YouTubeAutoWatchLater.Application.YouTube;
+using YouTubeAutoWatchLater.Core.Google;
+using YouTubeAutoWatchLater.Core.Handlers;
+using YouTubeAutoWatchLater.Core.YouTube;
 
-namespace YouTubeAutoWatchLater.Application;
+namespace YouTubeAutoWatchLater.Core;
 
 public static class Extensions
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration configuration)
     {
         return services
             .AddLogging()

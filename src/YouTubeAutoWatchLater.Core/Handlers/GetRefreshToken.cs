@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Application.Google;
+using YouTubeAutoWatchLater.Core.Google;
 
-namespace YouTubeAutoWatchLater.Application.Handlers;
+namespace YouTubeAutoWatchLater.Core.Handlers;
 
-public sealed  class GetRefreshToken
+public sealed class GetRefreshToken
 {
     public sealed record Query : IRequest<string>;
 

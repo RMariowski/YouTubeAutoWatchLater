@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using YouTubeAutoWatchLater.Application.YouTube.Options;
 using YouTubeAutoWatchLater.Core.Models;
 
-namespace YouTubeAutoWatchLater.Application.YouTube.Services;
+namespace YouTubeAutoWatchLater.Core.YouTube.Services;
 
 internal sealed class PlaylistRuleResolver : IPlaylistRuleResolver
 {

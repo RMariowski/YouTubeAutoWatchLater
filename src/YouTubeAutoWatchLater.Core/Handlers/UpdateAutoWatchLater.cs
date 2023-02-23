@@ -1,12 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Application.Repositories;
-using YouTubeAutoWatchLater.Application.YouTube.Services;
+using YouTubeAutoWatchLater.Core.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.Handlers;
+namespace YouTubeAutoWatchLater.Core.Handlers;
 
 public sealed class UpdateAutoWatchLater
 {

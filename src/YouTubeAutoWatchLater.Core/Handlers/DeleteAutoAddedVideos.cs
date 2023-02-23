@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Application.Repositories;
+using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.Handlers;
+namespace YouTubeAutoWatchLater.Core.Handlers;
 
 public class DeleteAutoAddedVideos
 {

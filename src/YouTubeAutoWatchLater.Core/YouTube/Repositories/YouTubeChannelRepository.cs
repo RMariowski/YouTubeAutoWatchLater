@@ -1,9 +1,10 @@
 ﻿using Google.Apis.YouTube.v3;
 using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Core;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
+namespace YouTubeAutoWatchLater.Core.YouTube.Repositories;
 
 internal sealed class YouTubeChannelRepository : IChannelRepository
 {

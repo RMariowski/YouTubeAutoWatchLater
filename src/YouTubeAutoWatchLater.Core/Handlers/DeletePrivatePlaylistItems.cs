@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using YouTubeAutoWatchLater.Application.YouTube.Options;
+using YouTubeAutoWatchLater.Core.YouTube;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.Handlers;
+namespace YouTubeAutoWatchLater.Core.Handlers;
 
 public sealed class DeletePrivatePlaylistItems
 {

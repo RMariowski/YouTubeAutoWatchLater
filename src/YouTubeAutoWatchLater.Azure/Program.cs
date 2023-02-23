@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using YouTubeAutoWatchLater.Application;
-using YouTubeAutoWatchLater.Application.Repositories;
 using YouTubeAutoWatchLater.Azure.Repositories;
+using YouTubeAutoWatchLater.Core;
+using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure;
 
@@ -17,7 +17,7 @@ internal class Program
                 var configuration = hostContext.Configuration;
 
                 services
-                    .AddApplication(configuration)
+                    .AddCore(configuration)
                     .AddScoped<IConfigurationRepository, ConfigurationTableStorageRepository>()
                     .AddScoped<IAutoAddedVideosRepository, AutoAddedVideosTableStorageRepository>();
             })

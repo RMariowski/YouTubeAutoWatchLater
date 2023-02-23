@@ -1,4 +1,4 @@
-namespace YouTubeAutoWatchLater.Application.Google.Options;
+namespace YouTubeAutoWatchLater.Core.Google;
 
 public sealed class GoogleOptions
 {

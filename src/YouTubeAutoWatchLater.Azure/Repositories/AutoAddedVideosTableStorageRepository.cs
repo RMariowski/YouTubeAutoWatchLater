@@ -1,7 +1,7 @@
 ﻿using Azure.Data.Tables;
-using YouTubeAutoWatchLater.Application;
-using YouTubeAutoWatchLater.Application.Repositories;
+using YouTubeAutoWatchLater.Core;
 using YouTubeAutoWatchLater.Core.Models;
+using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure.Repositories;
 

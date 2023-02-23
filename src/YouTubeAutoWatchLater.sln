@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeAutoWatchLater.Azure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeAutoWatchLater.Core", "YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj", "{0AC1FA92-9D82-4EC5-A327-2036111D4988}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeAutoWatchLater.Application", "YouTubeAutoWatchLater.Application\YouTubeAutoWatchLater.Application.csproj", "{049B0369-B629-4357-BAAA-13E5A60DCBFA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{0AC1FA92-9D82-4EC5-A327-2036111D4988}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AC1FA92-9D82-4EC5-A327-2036111D4988}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AC1FA92-9D82-4EC5-A327-2036111D4988}.Release|Any CPU.Build.0 = Release|Any CPU
-		{049B0369-B629-4357-BAAA-13E5A60DCBFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{049B0369-B629-4357-BAAA-13E5A60DCBFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{049B0369-B629-4357-BAAA-13E5A60DCBFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{049B0369-B629-4357-BAAA-13E5A60DCBFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

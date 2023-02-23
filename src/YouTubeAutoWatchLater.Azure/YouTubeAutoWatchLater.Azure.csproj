@@ -26,6 +26,6 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\YouTubeAutoWatchLater.Application\YouTubeAutoWatchLater.Application.csproj" />
+      <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj" />
     </ItemGroup>
 </Project>

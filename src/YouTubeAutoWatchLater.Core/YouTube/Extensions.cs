@@ -2,17 +2,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Application.Google;
-using YouTubeAutoWatchLater.Application.YouTube.Options;
-using YouTubeAutoWatchLater.Application.YouTube.Repositories;
-using YouTubeAutoWatchLater.Application.YouTube.Services;
+using YouTubeAutoWatchLater.Core.Google;
+using YouTubeAutoWatchLater.Core.YouTube.Repositories;
+using YouTubeAutoWatchLater.Core.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Repositories;
 
-namespace YouTubeAutoWatchLater.Application.YouTube;
+namespace YouTubeAutoWatchLater.Core.YouTube;
 
 internal static class Extensions
 {
-    public static IServiceCollection AddYouTube(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection AddYouTube(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<YouTubeOptions>().Bind(configuration.GetSection("YouTube"));
 

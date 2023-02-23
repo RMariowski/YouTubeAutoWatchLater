@@ -1,13 +1,14 @@
 ﻿using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Logging;
+using YouTubeAutoWatchLater.Core;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 using YouTubePlaylistItem = Google.Apis.YouTube.v3.Data.PlaylistItem;
 using PlaylistItem = YouTubeAutoWatchLater.Core.Models.PlaylistItem;
 using Video = YouTubeAutoWatchLater.Core.Models.Video;
 
-namespace YouTubeAutoWatchLater.Application.YouTube.Repositories;
+namespace YouTubeAutoWatchLater.Core.YouTube.Repositories;
 
 internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 {

@@ -1,4 +1,4 @@
-﻿namespace YouTubeAutoWatchLater.Application;
+﻿namespace YouTubeAutoWatchLater.Core;
 
 public static class Consts
 {
