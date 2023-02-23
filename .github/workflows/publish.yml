@@ -24,7 +24,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build
-        run: dotnet build src/ -c Release -o ./output
+        run: dotnet build src/ -c Release --property:OutputPath=../../output
 
       - name: Publish
         uses: Azure/functions-action@v1
