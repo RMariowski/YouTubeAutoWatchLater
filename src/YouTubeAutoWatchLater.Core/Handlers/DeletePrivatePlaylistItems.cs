@@ -27,14 +27,20 @@ public sealed class DeletePrivatePlaylistItems
 
         public async Task Handle(Command command, CancellationToken cancellationToken)
         {
-            PlaylistId playlistId = new(_options.PlaylistId);
+            var playlistIds = _options.DeletePrivatePlaylistItemsPlaylistIds
+                .Split(',')
+                .Select(rawId => new PlaylistId(rawId))
+                .ToArray();
 
-            var playlistItems = await _playlistItemRepository.GetPrivatePlaylistItemsOfPlaylist(playlistId);
-            var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
-            _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
+            foreach (var playlistId in playlistIds)
+            {
+                var playlistItems = await _playlistItemRepository.GetPrivatePlaylistItemsOfPlaylist(playlistId);
+                var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
+                _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
 
-            foreach (var playlistItemId in playlistItemIds)
-                await _playlistItemRepository.DeletePlaylistItem(playlistItemId);
+                foreach (var playlistItemId in playlistItemIds)
+                    await _playlistItemRepository.DeletePlaylistItem(playlistItemId);
+            }
         }
     }
 }
