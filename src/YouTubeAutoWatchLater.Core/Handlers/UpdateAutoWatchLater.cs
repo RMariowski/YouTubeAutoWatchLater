@@ -42,8 +42,7 @@ public sealed class UpdateAutoWatchLater
 
             var dateTime = DateTimeOffset.UtcNow.AddDays(-20);
             var videosToAdd = await GetNewVideosOfSubscriptions(subscriptions, dateTime);
-            await AddNewVideosToSubscriptionsPlaylists(videosToAdd.Values.SelectMany(videos => videos).ToArray());
-            await UpdateAutoAddedVideos(videosToAdd);
+            await AddNewVideosToSubscriptionsPlaylists(videosToAdd);
 
             await SetLastSuccessfulExecutionDateTimeToNow();
         }
@@ -98,40 +97,33 @@ public sealed class UpdateAutoWatchLater
             return newVideos;
         }
 
-        private async Task AddNewVideosToSubscriptionsPlaylists(IReadOnlyCollection<Video> videos)
+        private async Task AddNewVideosToSubscriptionsPlaylists(ConcurrentDictionary<ChannelId, Video[]> videosToAdd)
         {
-            if (videos.Count == 0)
+            if (videosToAdd.IsEmpty)
             {
                 _logger.LogInformation("No videos to add");
                 return;
             }
 
-            _logger.LogInformation("Adding recent videos to playlist");
-
-            foreach (var video in videos)
-            {
-                var playlistId = _playlistRuleResolver.Resolve(video);
-
-                _logger.LogInformation($"Adding {video} to playlist {playlistId}");
-                await _playlistItemRepository.AddToPlaylist(playlistId, video);
-                _logger.LogInformation($"Finished adding video {video} to playlist {playlistId}");
-            }
-
-            _logger.LogInformation("Finished adding recent videos to playlist");
-        }
-
-        private async Task UpdateAutoAddedVideos(ConcurrentDictionary<ChannelId, Video[]> videosToAdd)
-        {
-            _logger.LogInformation("Updating auto added videos");
+            _logger.LogInformation("Adding recent videos");
 
             foreach (var (channelId, videos) in videosToAdd)
             {
-                _logger.LogInformation($"Adding auto added videos of channel {channelId}");
-                await _autoAddedVideosRepository.Add(channelId, videos);
-                _logger.LogInformation($"Finished adding auto added videos of channel {channelId}");
+                foreach (var video in videos)
+                {
+                    var playlistId = _playlistRuleResolver.Resolve(video);
+
+                    _logger.LogInformation($"Adding {video} to playlist {playlistId}");
+                    await _playlistItemRepository.AddToPlaylist(playlistId, video);
+                    _logger.LogInformation($"Finished adding video {video} to playlist {playlistId}");
+
+                    _logger.LogInformation($"Adding auto added videos of channel {channelId}");
+                    await _autoAddedVideosRepository.Add(channelId, video);
+                    _logger.LogInformation($"Finished adding auto added videos of channel {channelId}");
+                }
             }
 
-            _logger.LogInformation("Finished updating auto added videos");
+            _logger.LogInformation("Finished adding recent videos");
         }
 
         private async Task SetLastSuccessfulExecutionDateTimeToNow()

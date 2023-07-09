@@ -18,13 +18,16 @@ public sealed class AutoAddedVideosTableStorageRepository : IAutoAddedVideosRepo
         _tableClient.CreateIfNotExists();
     }
 
+    public async Task Add(ChannelId channelId, Video video)
+    {
+        TableEntity entity = new(channelId.Value, video.Id.Value);
+        await _tableClient.AddEntityAsync(entity);
+    }
+
     public async Task Add(ChannelId channelId, Video[] videos)
     {
         foreach (var video in videos)
-        {
-            TableEntity entity = new(channelId.Value, video.Id.Value);
-            await _tableClient.AddEntityAsync(entity);
-        }
+            await Add(channelId, video);
     }
 
     public async Task<IReadOnlyList<VideoId>> GetAutoAddedVideos(ChannelId channelId)

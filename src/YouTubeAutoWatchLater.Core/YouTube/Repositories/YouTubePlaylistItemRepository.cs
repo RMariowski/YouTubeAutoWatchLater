@@ -54,16 +54,16 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
             var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
-                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAt > since ||
-                                       playlistItem.Snippet.PublishedAt > since)
+                .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAtDateTimeOffset > since ||
+                                       playlistItem.Snippet.PublishedAtDateTimeOffset > since)
                 .Select(playlistItem => new Video
                 (
                     new VideoId(playlistItem.Snippet.ResourceId.VideoId),
                     playlistItem.Snippet.ResourceId.Kind,
                     playlistItem.Snippet.Title,
                     playlistItem.Snippet.ChannelTitle,
-                    playlistItem.ContentDetails.VideoPublishedAt!.Value,
-                    playlistItem.Snippet.PublishedAt!.Value
+                    playlistItem.ContentDetails.VideoPublishedAtDateTimeOffset!.Value,
+                    playlistItem.Snippet.PublishedAtDateTimeOffset!.Value
                 ))
                 .ToArray();
 

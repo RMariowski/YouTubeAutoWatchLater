@@ -6,6 +6,6 @@ public sealed record Video
     string Kind,
     string Title,
     string ChannelTitle,
-    DateTime PublishedAt,
-    DateTime AddedToUploadPlaylistAt
+    DateTimeOffset PublishedAt,
+    DateTimeOffset AddedToUploadPlaylistAt
 );
