@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using YouTubeAutoWatchLater.Azure.Repositories;
 using YouTubeAutoWatchLater.Core;
@@ -11,7 +12,12 @@ internal class Program
     private static async Task Main(string[] args)
     {
         var host = new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults()
+            .ConfigureFunctionsWorkerDefaults((_, builder) =>
+            {
+                builder
+                    .AddApplicationInsights()
+                    .AddApplicationInsightsLogger();
+            })
             .ConfigureServices((hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
