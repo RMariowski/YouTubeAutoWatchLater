@@ -6,7 +6,7 @@ param appName string = 'yt-auto-watch-later'
 
 var storageAccountName = replace(appName, '-', '')
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
   sku: {
@@ -25,7 +25,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
+resource hostingPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appName
   location: location
   sku: {
@@ -35,7 +35,7 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   properties: {}
 }
 
-resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
+resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: appName
   location: location
   kind: 'functionapp'
@@ -106,7 +106,8 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
       http20Enabled: true
+      netFrameworkVersion: 'v7.0'
     }
-    httpsOnly: false
+    httpsOnly: true
   }
 }
