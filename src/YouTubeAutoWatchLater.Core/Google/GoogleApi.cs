@@ -83,13 +83,13 @@ internal sealed class GoogleApi : IGoogleApi
         _logger.LogInformation($"Creating path of {clientSecretsFileName}");
         var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var clientSecretsFilePath = Path.Combine(binDirectory, clientSecretsFileName);
-        _logger.LogInformation($"Created path: {clientSecretsFilePath}");
+        _logger.LogInformation("Created path: {ClientSecretsFilePath}", clientSecretsFilePath);
 
-        _logger.LogInformation($"Reading {clientSecretsFilePath} file");
+        _logger.LogInformation("Reading {ClientSecretsFilePath} file", clientSecretsFilePath);
         var googleClientSecrets = GoogleClientSecrets.FromFile(clientSecretsFilePath);
         if (googleClientSecrets is null)
             throw new ApplicationException($"{clientSecretsFilePath} file not found");
-        _logger.LogInformation($"Finished reading {clientSecretsFilePath} file");
+        _logger.LogInformation("Finished reading {ClientSecretsFilePath} file", clientSecretsFilePath);
 
         return googleClientSecrets;
     }

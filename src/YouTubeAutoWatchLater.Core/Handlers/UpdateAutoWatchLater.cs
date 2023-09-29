@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Net;
+using Google;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Core.YouTube.Services;
@@ -78,13 +80,13 @@ public sealed class UpdateAutoWatchLater
             ParallelOptions options = new() { MaxDegreeOfParallelism = 10 };
             await Parallel.ForEachAsync(subscriptions.Values, options, async (channel, _) =>
             {
-                _logger.LogInformation($"Getting videos auto added for last month of {channel}");
+                _logger.LogInformation("Getting videos auto added for last month of {Channel}", channel);
                 var videosAutoAdded = await _autoAddedVideosRepository.GetAutoAddedVideos(channel.Id);
-                _logger.LogInformation($"Finished getting videos auto added for last month of {channel}");
+                _logger.LogInformation("Finished getting videos auto added for last month of {Channel}", channel);
 
-                _logger.LogInformation($"Getting uploads playlist items of {channel}");
+                _logger.LogInformation("Getting uploads playlist items of {Channel}", channel);
                 var videosSinceDateTime = await _playlistItemRepository.GetVideos(channel.UploadsPlaylist!, dateTime);
-                _logger.LogInformation($"Finished getting uploads playlist items of {channel}");
+                _logger.LogInformation("Finished getting uploads playlist items of {Channel}", channel);
 
                 var videosToAdd = videosSinceDateTime
                     .Where(video => videosAutoAdded.Contains(video.Id) is false)
@@ -113,13 +115,23 @@ public sealed class UpdateAutoWatchLater
                 {
                     var playlistId = _playlistRuleResolver.Resolve(video);
 
-                    _logger.LogInformation($"Adding {video} to playlist {playlistId}");
-                    await _playlistItemRepository.AddToPlaylist(playlistId, video);
-                    _logger.LogInformation($"Finished adding video {video} to playlist {playlistId}");
+                    try
+                    {
+                        _logger.LogInformation("Adding {Video} to playlist {PlaylistId}", video, playlistId);
+                        await _playlistItemRepository.AddToPlaylist(playlistId, video);
+                        _logger.LogInformation("Finished adding video {Video} to playlist {PlaylistId}",
+                            video, playlistId);
 
-                    _logger.LogInformation($"Adding auto added videos of channel {channelId}");
-                    await _autoAddedVideosRepository.Add(channelId, video);
-                    _logger.LogInformation($"Finished adding auto added videos of channel {channelId}");
+                        _logger.LogInformation("Adding auto added videos of channel {ChannelId}", channelId);
+                        await _autoAddedVideosRepository.Add(channelId, video);
+                        _logger.LogInformation("Finished adding auto added videos of channel {ChannelId}", channelId);
+                    }
+                    catch (GoogleApiException googleApiException)
+                        when (googleApiException.HttpStatusCode == HttpStatusCode.Conflict)
+                    {
+                        _logger.LogError(googleApiException, "Unable to add video {Video} to playlist {PlaylistId}",
+                            video, playlistId);
+                    }
                 }
             }
 
