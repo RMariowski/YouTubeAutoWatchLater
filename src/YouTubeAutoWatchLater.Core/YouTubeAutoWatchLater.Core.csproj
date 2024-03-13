@@ -7,10 +7,10 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.67.0.3330" />
+        <PackageReference Include="Google.Apis.YouTube.v3" Version="1.67.0.3351" />
         <PackageReference Include="MediatR" Version="12.2.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     </ItemGroup>
 
