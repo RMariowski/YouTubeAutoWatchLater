@@ -24,18 +24,12 @@ public sealed class AutoAddedVideosTableStorageRepository : IAutoAddedVideosRepo
         await _tableClient.AddEntityAsync(entity);
     }
 
-    public async Task Add(ChannelId channelId, Video[] videos)
-    {
-        foreach (var video in videos)
-            await Add(channelId, video);
-    }
-
     public async Task<IReadOnlyList<VideoId>> GetAutoAddedVideos(ChannelId channelId)
     {
         var query = _tableClient.QueryAsync<TableEntity>(
             $"PartitionKey eq '{channelId.Value}'", Consts.MaxResults);
 
-        List<VideoId> videos = new();
+        List<VideoId> videos = [];
         await foreach (var page in query.AsPages())
             videos.AddRange(page.Values.Select(entity => new VideoId(entity.RowKey)));
 

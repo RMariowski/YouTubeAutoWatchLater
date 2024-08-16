@@ -10,7 +10,7 @@ namespace YouTubeAutoWatchLater.Azure;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static async Task Main()
     {
         var host = new HostBuilder()
             .ConfigureFunctionsWorkerDefaults()

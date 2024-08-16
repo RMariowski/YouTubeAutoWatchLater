@@ -1,5 +1,4 @@
 ﻿using Google.Apis.YouTube.v3;
-using YouTubeAutoWatchLater.Core;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 

@@ -1,7 +1,6 @@
 ﻿using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Core;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
 using YouTubePlaylistItem = Google.Apis.YouTube.v3.Data.PlaylistItem;
@@ -42,7 +41,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 
     public async Task<IReadOnlyList<Video>> GetVideos(PlaylistId playlistId, DateTimeOffset since)
     {
-        List<Video> recentVideos = new();
+        List<Video> recentVideos = [];
 
         var pageToken = string.Empty;
         do
@@ -82,7 +81,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
     {
         _logger.LogInformation($"Getting private playlist items from playlist {playlistId}");
 
-        List<PlaylistItem> playlistItems = new();
+        List<PlaylistItem> playlistItems = [];
 
         var pageToken = string.Empty;
         do

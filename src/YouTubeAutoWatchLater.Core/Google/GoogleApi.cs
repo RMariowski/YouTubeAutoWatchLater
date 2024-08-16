@@ -58,7 +58,7 @@ internal sealed class GoogleApi : IGoogleApi
 
         var contentStream = await response.Content.ReadAsStreamAsync();
         using StreamReader streamReader = new(contentStream);
-        using JsonTextReader jsonReader = new(streamReader);
+        await using JsonTextReader jsonReader = new(streamReader);
         var tokenResponse = new JsonSerializer().Deserialize<TokenResponse>(jsonReader);
         if (tokenResponse is null)
             throw new ApplicationException("Something went wrong with deserialization of token response");

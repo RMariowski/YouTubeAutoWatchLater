@@ -3,7 +3,7 @@
 public sealed class YouTubeOptions
 {
     public string PlaylistId { get; set; } = string.Empty;
-    public PlaylistRuleOptions[] PlaylistRules { get; set; } = Array.Empty<PlaylistRuleOptions>();
+    public PlaylistRuleOptions[] PlaylistRules { get; set; } = [];
     public string DeletePrivatePlaylistItemsPlaylistIds { get; set; } = string.Empty;
 }
 

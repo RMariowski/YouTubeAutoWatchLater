@@ -1,5 +1,3 @@
 ﻿namespace YouTubeAutoWatchLater.Core.Models;
 
-public sealed class Subscriptions : Dictionary<ChannelId, Channel>
-{
-}
+public sealed class Subscriptions : Dictionary<ChannelId, Channel>;
