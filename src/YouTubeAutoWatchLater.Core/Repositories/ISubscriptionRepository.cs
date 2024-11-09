@@ -4,5 +4,5 @@ namespace YouTubeAutoWatchLater.Core.Repositories;
 
 public interface ISubscriptionRepository
 {
-    Task<Subscriptions> GetMySubscriptions();
+    Task<Subscriptions> GetMySubscriptionsAsync();
 }

@@ -13,7 +13,7 @@ internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
         _youTubeService = youTubeService;
     }
     
-    public async Task<Subscriptions> GetMySubscriptions()
+    public async Task<Subscriptions> GetMySubscriptionsAsync()
     {
         Subscriptions youTubeSubscriptions = new();
 

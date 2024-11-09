@@ -20,7 +20,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         _logger = logger;
     }
 
-    public async Task AddToPlaylist(PlaylistId playlistId, Video video)
+    public async Task AddToPlaylistAsync(PlaylistId playlistId, Video video)
     {
         YouTubePlaylistItem playlistItem = new()
         {
@@ -39,7 +39,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         await _youTubeService.PlaylistItems.Insert(playlistItem, "snippet").ExecuteAsync();
     }
 
-    public async Task<IReadOnlyList<Video>> GetVideos(PlaylistId playlistId, DateTimeOffset since)
+    public async Task<IReadOnlyList<Video>> GetVideosAsync(PlaylistId playlistId, DateTimeOffset since)
     {
         List<Video> recentVideos = [];
 
@@ -77,9 +77,9 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         return recentVideos;
     }
 
-    public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylist(PlaylistId playlistId)
+    public async Task<IReadOnlyList<PlaylistItem>> GetPrivatePlaylistItemsOfPlaylistAsync(PlaylistId playlistId)
     {
-        _logger.LogInformation($"Getting private playlist items from playlist {playlistId}");
+        _logger.LogInformation("Getting private playlist items from playlist {PlaylistId}", playlistId);
 
         List<PlaylistItem> playlistItems = [];
 
@@ -100,16 +100,16 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
             pageToken = playlistItemsListResponse.NextPageToken;
         } while (!string.IsNullOrEmpty(pageToken));
 
-        _logger.LogInformation($"Finished getting private playlist items from playlist {playlistId}");
+        _logger.LogInformation("Finished getting private playlist items from playlist {PlaylistId}", playlistId);
 
         return playlistItems;
     }
 
-    public async Task DeletePlaylistItem(PlaylistItemId id)
+    public async Task DeletePlaylistItemAsync(PlaylistItemId playlistId)
     {
-        _logger.LogInformation($"Deleting playlist item {id}");
-        var playlistItemsDeleteRequest = _youTubeService.PlaylistItems.Delete(id.Value);
+        _logger.LogInformation("Deleting playlist item {PlaylistId}", playlistId);
+        var playlistItemsDeleteRequest = _youTubeService.PlaylistItems.Delete(playlistId.Value);
         _ = await playlistItemsDeleteRequest.ExecuteAsync();
-        _logger.LogInformation($"Finished deleting playlist item {id}");
+        _logger.LogInformation("Finished deleting playlist item {PlaylistId}", playlistId);
     }
 }

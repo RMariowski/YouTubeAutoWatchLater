@@ -22,7 +22,7 @@ internal sealed class GetRefreshTokenHandler : IGetRefreshTokenHandler
     public async Task<string> HandleAsync()
     {
         _logger.LogInformation("Starting authorization");
-        var credentials = await _googleApi.Authorize();
+        var credentials = await _googleApi.AuthorizeAsync();
         _logger.LogInformation("Authorization finished");
 
         return credentials.Token.RefreshToken;

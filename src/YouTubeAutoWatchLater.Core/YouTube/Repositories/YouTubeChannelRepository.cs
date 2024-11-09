@@ -16,7 +16,8 @@ internal sealed class YouTubeChannelRepository : IChannelRepository
         _logger = logger;
     }
 
-    public async Task<IReadOnlyDictionary<ChannelId, PlaylistId>> GetUploadsPlaylists(IEnumerable<ChannelId> channelIds)
+    public async Task<IReadOnlyDictionary<ChannelId, PlaylistId>> GetUploadsPlaylistsAsync(
+        IEnumerable<ChannelId> channelIds)
     {
         Dictionary<ChannelId, PlaylistId> result = new();
 
@@ -25,14 +26,16 @@ internal sealed class YouTubeChannelRepository : IChannelRepository
         {
             var chunkedChannelIds = chunks[i];
 
-            _logger.LogInformation($"Getting channels of subscriptions chunk {i + 1}/{chunks.Length}");
+            _logger.LogInformation("Getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
+                i + 1, chunks.Length);
 
             var channelsListRequest = _youTubeService.Channels.List("contentDetails");
             channelsListRequest.Id = chunkedChannelIds.Select(id => id.Value).ToArray();
             channelsListRequest.MaxResults = chunkedChannelIds.Length;
             var channelListResponse = await channelsListRequest.ExecuteAsync();
 
-            _logger.LogInformation($"Finished getting channels of subscriptions chunk {i + 1}/{chunks.Length}");
+            _logger.LogInformation("Finished getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
+                i + 1, chunks.Length);
 
             foreach (var channel in channelListResponse.Items)
             {

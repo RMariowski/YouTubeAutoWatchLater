@@ -52,10 +52,14 @@ internal sealed class PlaylistRuleResolver : IPlaylistRuleResolver
             bool? match = null;
 
             if (match is null or true && _channelNames.Count > 0)
+            {
                 match = _channelNames.Contains(video.ChannelTitle.ToLowerInvariant());
+            }
 
             if (match is null or true && _titleKeywords.Count > 0)
+            {
                 match = _titleKeywords.Any(keyword => video.Title.Contains(keyword));
+            }
 
             return match.HasValue && match.Value;
         }

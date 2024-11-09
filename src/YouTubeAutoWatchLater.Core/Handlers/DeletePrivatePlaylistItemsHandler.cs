@@ -34,12 +34,12 @@ internal sealed class DeletePrivatePlaylistItemsHandler : IDeletePrivatePlaylist
 
         foreach (var playlistId in playlistIds)
         {
-            var playlistItems = await _playlistItemRepository.GetPrivatePlaylistItemsOfPlaylist(playlistId);
+            var playlistItems = await _playlistItemRepository.GetPrivatePlaylistItemsOfPlaylistAsync(playlistId);
             var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
-            _logger.LogInformation($"{playlistItemIds.Count} playlist items are marked as private");
+            _logger.LogInformation("{Count} playlist items are marked as private", playlistItemIds.Count);
 
             foreach (var playlistItemId in playlistItemIds)
-                await _playlistItemRepository.DeletePlaylistItem(playlistItemId);
+                await _playlistItemRepository.DeletePlaylistItemAsync(playlistItemId);
         }
     }
 }

@@ -23,27 +23,26 @@ internal sealed class GoogleApi : IGoogleApi
         _logger = logger;
     }
 
-    public async Task<UserCredential> Authorize()
+    public async Task<UserCredential> AuthorizeAsync()
     {
         var googleClientSecrets = await GoogleClientSecrets.FromFileAsync("client_secrets.json");
         var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            googleClientSecrets.Secrets, new[] { YouTubeService.Scope.Youtube },
+            googleClientSecrets.Secrets, [YouTubeService.Scope.Youtube],
             "user", CancellationToken.None, new FileDataStore(GetType().ToString()));
         return credential;
     }
 
-    public async Task<string> GetAccessToken()
+    public async Task<string> GetAccessTokenAsync()
     {
         var secrets = GetClientSecrets().Secrets;
         HttpRequestMessage refreshMessage = new(HttpMethod.Post, "https://www.googleapis.com/oauth2/v4/token")
         {
-            Content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
-            {
-                new("client_id", secrets.ClientId),
-                new("client_secret", secrets.ClientSecret),
-                new("refresh_token", _options.RefreshToken),
-                new("grant_type", "refresh_token")
-            })
+            Content = new FormUrlEncodedContent([
+                new KeyValuePair<string, string>("client_id", secrets.ClientId),
+                new KeyValuePair<string, string>("client_secret", secrets.ClientSecret),
+                new KeyValuePair<string, string>("refresh_token", _options.RefreshToken),
+                new KeyValuePair<string, string>("grant_type", "refresh_token")
+            ])
         };
 
         _logger.LogInformation("Sending request for getting access token");
@@ -79,8 +78,6 @@ internal sealed class GoogleApi : IGoogleApi
     private GoogleClientSecrets GetClientSecrets()
     {
         const string clientSecretsFileName = "client_secrets.json";
-
-        _logger.LogInformation($"Creating path of {clientSecretsFileName}");
         var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var clientSecretsFilePath = Path.Combine(binDirectory, clientSecretsFileName);
         _logger.LogInformation("Created path: {ClientSecretsFilePath}", clientSecretsFilePath);

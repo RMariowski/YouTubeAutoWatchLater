@@ -5,9 +5,9 @@ namespace YouTubeAutoWatchLater.Core.Google;
 
 public interface IGoogleApi
 {
-    Task<UserCredential> Authorize();
+    Task<UserCredential> AuthorizeAsync();
 
-    Task<string> GetAccessToken();
+    Task<string> GetAccessTokenAsync();
 
     YouTubeService CreateYouTubeService(string accessToken);
 }

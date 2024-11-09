@@ -35,7 +35,7 @@ internal static class Extensions
         var logger = serviceProvider.GetRequiredService<ILogger<YouTubeService>>();
 
         logger.LogInformation("Getting access token");
-        var accessToken = googleApi.GetAccessToken().GetAwaiter().GetResult();
+        var accessToken = googleApi.GetAccessTokenAsync().GetAwaiter().GetResult();
         logger.LogInformation("Finished getting access token");
 
         logger.LogInformation("Creating YouTube Service");

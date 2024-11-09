@@ -43,39 +43,37 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
 
     public async Task HandleAsync()
     {
-        var subscriptions = await GetSubscriptions();
-        await SetUploadsPlaylists(subscriptions);
+        var subscriptions = await GetSubscriptionsAsync();
 
         var dateTime = DateTimeOffset.UtcNow.AddDays(-20);
-        var videosToAdd = await GetNewVideosOfSubscriptions(subscriptions, dateTime);
-        await AddNewVideosToSubscriptionsPlaylists(videosToAdd);
+        var videosToAdd = await GetNewVideosOfSubscriptionsAsync(subscriptions, dateTime);
+        await AddNewVideosToSubscriptionsPlaylistsAsync(videosToAdd);
 
-        await SetLastSuccessfulExecutionDateTimeToNow();
+        await SetLastSuccessfulExecutionDateTimeToNowAsync();
     }
 
-    private async Task<Subscriptions> GetSubscriptions()
+    private async Task<Subscriptions> GetSubscriptionsAsync()
     {
         _logger.LogInformation("Getting subscriptions");
-        var subscriptions = await _subscriptionRepository.GetMySubscriptions();
+        var subscriptions = await _subscriptionRepository.GetMySubscriptionsAsync();
         _logger.LogInformation("Finished getting subscriptions");
+
+        _logger.LogInformation("Setting uploads playlist for subscriptions");
+
+        var channelIds = subscriptions.Select(subscription => subscription.Key).ToArray();
+        var uploadsPlaylists = await _channelRepository.GetUploadsPlaylistsAsync(channelIds);
+
+        foreach (var uploadsPlaylist in uploadsPlaylists)
+        {
+            subscriptions[uploadsPlaylist.Key].UploadsPlaylist = uploadsPlaylist.Value;
+        }
+
+        _logger.LogInformation("Finished setting uploads playlist for subscriptions");
 
         return subscriptions;
     }
 
-    private async Task SetUploadsPlaylists(Subscriptions subscriptions)
-    {
-        _logger.LogInformation("Setting uploads playlist for subscriptions");
-
-        var channelIds = subscriptions.Select(subscription => subscription.Key).ToArray();
-        var uploadsPlaylists = await _channelRepository.GetUploadsPlaylists(channelIds);
-
-        foreach (var uploadsPlaylist in uploadsPlaylists)
-            subscriptions[uploadsPlaylist.Key].UploadsPlaylist = uploadsPlaylist.Value;
-
-        _logger.LogInformation("Finished setting uploads playlist for subscriptions");
-    }
-
-    private async Task<ConcurrentDictionary<ChannelId, Video[]>> GetNewVideosOfSubscriptions(
+    private async Task<ConcurrentDictionary<ChannelId, Video[]>> GetNewVideosOfSubscriptionsAsync(
         Subscriptions subscriptions, DateTimeOffset dateTime)
     {
         _logger.LogInformation("Setting recent videos of subscriptions");
@@ -89,7 +87,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
             _logger.LogInformation("Finished getting videos auto added for last month of {Channel}", channel);
 
             _logger.LogInformation("Getting uploads playlist items of {Channel}", channel);
-            var videosSinceDateTime = await _playlistItemRepository.GetVideos(channel.UploadsPlaylist!, dateTime);
+            var videosSinceDateTime = await _playlistItemRepository.GetVideosAsync(channel.UploadsPlaylist!, dateTime);
             _logger.LogInformation("Finished getting uploads playlist items of {Channel}", channel);
 
             var videosToAdd = videosSinceDateTime
@@ -103,7 +101,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
         return newVideos;
     }
 
-    private async Task AddNewVideosToSubscriptionsPlaylists(ConcurrentDictionary<ChannelId, Video[]> videosToAdd)
+    private async Task AddNewVideosToSubscriptionsPlaylistsAsync(ConcurrentDictionary<ChannelId, Video[]> videosToAdd)
     {
         if (videosToAdd.IsEmpty)
         {
@@ -122,7 +120,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
                 try
                 {
                     _logger.LogInformation("Adding {Video} to playlist {PlaylistId}", video, playlistId);
-                    await _playlistItemRepository.AddToPlaylist(playlistId, video);
+                    await _playlistItemRepository.AddToPlaylistAsync(playlistId, video);
                     _logger.LogInformation("Finished adding video {Video} to playlist {PlaylistId}",
                         video, playlistId);
 
@@ -142,7 +140,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
         _logger.LogInformation("Finished adding recent videos");
     }
 
-    private async Task SetLastSuccessfulExecutionDateTimeToNow()
+    private async Task SetLastSuccessfulExecutionDateTimeToNowAsync()
     {
         _logger.LogInformation("Setting last successful execution date time");
         await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNowAsync();
