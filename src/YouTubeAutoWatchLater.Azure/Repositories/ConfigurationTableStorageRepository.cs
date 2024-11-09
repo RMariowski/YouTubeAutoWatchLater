@@ -21,7 +21,7 @@ public sealed class ConfigurationTableStorageRepository : IConfigurationReposito
         _tableClient.CreateIfNotExists();
     }
 
-    public async Task<DateTime> GetLastSuccessfulExecutionDateTime()
+    public async Task<DateTime> GetLastSuccessfulExecutionDateTimeAsync()
     {
         Response<TableEntity>? entityResponse = null;
 
@@ -41,7 +41,7 @@ public sealed class ConfigurationTableStorageRepository : IConfigurationReposito
             : DateTimeOffset.Parse(lastSuccessfulExecutionAsString).UtcDateTime;
     }
 
-    public async Task SetLastSuccessfulExecutionDateTimeToNow()
+    public async Task SetLastSuccessfulExecutionDateTimeToNowAsync()
     {
         TableEntity entity = new(GeneralPartitionKey, LastSuccessfulRun)
         {

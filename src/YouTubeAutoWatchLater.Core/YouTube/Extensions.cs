@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Core.Google;
+using YouTubeAutoWatchLater.Core.Handlers;
 using YouTubeAutoWatchLater.Core.YouTube.Repositories;
 using YouTubeAutoWatchLater.Core.YouTube.Services;
 using YouTubeAutoWatchLater.Core.Repositories;
@@ -20,7 +21,11 @@ internal static class Extensions
             .AddScoped<ISubscriptionRepository, YouTubeSubscriptionRepository>()
             .AddScoped<IChannelRepository, YouTubeChannelRepository>()
             .AddScoped<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
-            .AddScoped<IPlaylistRuleResolver, PlaylistRuleResolver>();
+            .AddScoped<IPlaylistRuleResolver, PlaylistRuleResolver>()
+            .AddTransient<IUpdateAutoWatchLaterHandler, UpdateAutoWatchLaterHandler>()
+            .AddTransient<IDeleteAutoAddedVideosHandler, DeleteAutoAddedVideosHandler>()
+            .AddTransient<IDeletePrivatePlaylistItemsHandler, DeletePrivatePlaylistItemsHandler>()
+            .AddTransient<IGetRefreshTokenHandler, GetRefreshTokenHandler>();
     }
 
     // TODO: Would be good to make it somehow asynchronous

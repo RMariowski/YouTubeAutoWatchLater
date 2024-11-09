@@ -18,33 +18,38 @@ public sealed class AutoAddedVideosTableStorageRepository : IAutoAddedVideosRepo
         _tableClient.CreateIfNotExists();
     }
 
-    public async Task Add(ChannelId channelId, Video video)
+    public async Task AddAsync(ChannelId channelId, Video video)
     {
         TableEntity entity = new(channelId.Value, video.Id.Value);
         await _tableClient.AddEntityAsync(entity);
     }
 
-    public async Task<IReadOnlyList<VideoId>> GetAutoAddedVideos(ChannelId channelId)
+    public async Task<IReadOnlyList<VideoId>> GetAutoAddedVideosAsync(ChannelId channelId)
     {
         var query = _tableClient.QueryAsync<TableEntity>(
             $"PartitionKey eq '{channelId.Value}'", Consts.MaxResults);
 
         List<VideoId> videos = [];
         await foreach (var page in query.AsPages())
-            videos.AddRange(page.Values.Select(entity => new VideoId(entity.RowKey)));
+        {
+            var videoIds = page.Values.Select(entity => new VideoId(entity.RowKey));
+            videos.AddRange(videoIds);
+        }
 
         return videos;
     }
 
-    public async Task DeleteOlderThan(DateTimeOffset dateTime)
+    public async Task DeleteOlderThanAsync(DateTimeOffset dateTime)
     {
-        var query = _tableClient.QueryAsync<TableEntity>(
-            $"Timestamp le datetime'{dateTime:yyyy-MM-ddTHH:mm}'", Consts.MaxResults);
+        var filter = $"Timestamp le datetime'{dateTime:yyyy-MM-ddTHH:mm}'";
+        var query = _tableClient.QueryAsync<TableEntity>(filter, Consts.MaxResults);
 
         await foreach (var page in query.AsPages())
         {
             foreach (var entity in page.Values)
+            {
                 await _tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+            }
         }
     }
 }

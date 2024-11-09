@@ -2,7 +2,7 @@
 
 public interface IConfigurationRepository
 {
-    Task<DateTime> GetLastSuccessfulExecutionDateTime();
+    Task<DateTime> GetLastSuccessfulExecutionDateTimeAsync();
 
-    Task SetLastSuccessfulExecutionDateTimeToNow();
+    Task SetLastSuccessfulExecutionDateTimeToNowAsync();
 }
