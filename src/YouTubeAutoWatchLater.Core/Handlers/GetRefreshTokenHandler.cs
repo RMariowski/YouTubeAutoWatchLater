@@ -5,7 +5,7 @@ namespace YouTubeAutoWatchLater.Core.Handlers;
 
 public interface IGetRefreshTokenHandler
 {
-    Task<string> HandleAsync();
+    Task<string> HandleAsync(int refreshTokenIdx);
 }
 
 internal sealed class GetRefreshTokenHandler : IGetRefreshTokenHandler
@@ -19,10 +19,10 @@ internal sealed class GetRefreshTokenHandler : IGetRefreshTokenHandler
         _logger = logger;
     }
 
-    public async Task<string> HandleAsync()
+    public async Task<string> HandleAsync(int refreshTokenIdx)
     {
         _logger.LogInformation("Starting authorization");
-        var credentials = await _googleApi.AuthorizeAsync();
+        var credentials = await _googleApi.AuthorizeAsync(refreshTokenIdx);
         _logger.LogInformation("Authorization finished");
 
         return credentials.Token.RefreshToken;

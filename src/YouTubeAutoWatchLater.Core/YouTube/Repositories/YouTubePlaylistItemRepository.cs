@@ -1,8 +1,8 @@
-﻿using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
+﻿using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
+using YouTubeAutoWatchLater.Core.YouTube.Services;
 using YouTubePlaylistItem = Google.Apis.YouTube.v3.Data.PlaylistItem;
 using PlaylistItem = YouTubeAutoWatchLater.Core.Models.PlaylistItem;
 using Video = YouTubeAutoWatchLater.Core.Models.Video;
@@ -11,12 +11,12 @@ namespace YouTubeAutoWatchLater.Core.YouTube.Repositories;
 
 internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
 {
-    private readonly YouTubeService _youTubeService;
+    private readonly IYouTubeApi _youTubeApi;
     private readonly ILogger<YouTubePlaylistItemRepository> _logger;
 
-    public YouTubePlaylistItemRepository(YouTubeService youTubeService, ILogger<YouTubePlaylistItemRepository> logger)
+    public YouTubePlaylistItemRepository(IYouTubeApi youTubeApi, ILogger<YouTubePlaylistItemRepository> logger)
     {
-        _youTubeService = youTubeService;
+        _youTubeApi = youTubeApi;
         _logger = logger;
     }
 
@@ -36,7 +36,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
             }
         };
 
-        await _youTubeService.PlaylistItems.Insert(playlistItem, "snippet").ExecuteAsync();
+        await _youTubeApi.InsertPlaylistItemAsync(playlistItem);
     }
 
     public async Task<IReadOnlyList<Video>> GetVideosAsync(PlaylistId playlistId, DateTimeOffset since)
@@ -46,11 +46,8 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         var pageToken = string.Empty;
         do
         {
-            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("snippet,contentDetails");
-            playlistItemsListRequest.PlaylistId = playlistId.Value;
-            playlistItemsListRequest.MaxResults = Consts.MaxResults;
-            playlistItemsListRequest.PageToken = pageToken;
-            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+            var playlistItemsListResponse = await _youTubeApi.GetPlaylistItemsAsync(
+                playlistId, pageToken, "snippet,contentDetails");
 
             var videosNewerThanSpecifiedDateTime = playlistItemsListResponse.Items
                 .Where(playlistItem => playlistItem.ContentDetails.VideoPublishedAtDateTimeOffset > since ||
@@ -86,11 +83,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
         var pageToken = string.Empty;
         do
         {
-            var playlistItemsListRequest = _youTubeService.PlaylistItems.List("id,status");
-            playlistItemsListRequest.PlaylistId = playlistId.Value;
-            playlistItemsListRequest.MaxResults = Consts.MaxResults;
-            playlistItemsListRequest.PageToken = pageToken;
-            var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+            var playlistItemsListResponse = await _youTubeApi.GetPlaylistItemsAsync(playlistId, pageToken, "id,status");
 
             var privatePlaylistItems = playlistItemsListResponse.Items
                 .Where(item => item.Status.PrivacyStatus is "private" or "privacyStatusUnspecified")
@@ -108,8 +101,7 @@ internal sealed class YouTubePlaylistItemRepository : IPlaylistItemRepository
     public async Task DeletePlaylistItemAsync(PlaylistItemId playlistId)
     {
         _logger.LogInformation("Deleting playlist item {PlaylistId}", playlistId);
-        var playlistItemsDeleteRequest = _youTubeService.PlaylistItems.Delete(playlistId.Value);
-        _ = await playlistItemsDeleteRequest.ExecuteAsync();
+        await _youTubeApi.DeletePlaylistItemAsync(playlistId);
         _logger.LogInformation("Finished deleting playlist item {PlaylistId}", playlistId);
     }
 }

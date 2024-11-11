@@ -6,4 +6,4 @@ riderModule.iml
 
 .idea/
 local.settings.json
-client_secrets.json
+client_secrets*.json

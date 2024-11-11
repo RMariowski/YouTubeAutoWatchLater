@@ -17,7 +17,7 @@ internal static class Extensions
         services.AddOptions<YouTubeOptions>().Bind(configuration.GetSection("YouTube"));
 
         return services
-            .AddScoped(CreateYouTubeService)
+            .AddScoped<IYouTubeApi, YouTubeApi>()
             .AddScoped<ISubscriptionRepository, YouTubeSubscriptionRepository>()
             .AddScoped<IChannelRepository, YouTubeChannelRepository>()
             .AddScoped<IPlaylistItemRepository, YouTubePlaylistItemRepository>()
@@ -26,22 +26,5 @@ internal static class Extensions
             .AddTransient<IDeleteAutoAddedVideosHandler, DeleteAutoAddedVideosHandler>()
             .AddTransient<IDeletePrivatePlaylistItemsHandler, DeletePrivatePlaylistItemsHandler>()
             .AddTransient<IGetRefreshTokenHandler, GetRefreshTokenHandler>();
-    }
-
-    // TODO: Would be good to make it somehow asynchronous
-    private static YouTubeService CreateYouTubeService(IServiceProvider serviceProvider)
-    {
-        var googleApi = serviceProvider.GetRequiredService<IGoogleApi>();
-        var logger = serviceProvider.GetRequiredService<ILogger<YouTubeService>>();
-
-        logger.LogInformation("Getting access token");
-        var accessToken = googleApi.GetAccessTokenAsync().GetAwaiter().GetResult();
-        logger.LogInformation("Finished getting access token");
-
-        logger.LogInformation("Creating YouTube Service");
-        var youTubeService = googleApi.CreateYouTubeService(accessToken);
-        logger.LogInformation("Finished creating YouTube API");
-
-        return youTubeService;
     }
 }

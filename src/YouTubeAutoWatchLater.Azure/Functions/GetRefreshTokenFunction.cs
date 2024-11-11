@@ -19,7 +19,8 @@ public sealed class GetRefreshTokenFunction
         [HttpTrigger(AuthorizationLevel.Function, "get")]
         HttpRequestData request)
     {
-        var refreshToken = await _handler.HandleAsync();
+        var parsed = int.TryParse(request.Query.Get("index"), out var refreshTokenIdx);
+        var refreshToken = await _handler.HandleAsync(parsed ? refreshTokenIdx : 0);
 
         var response = request.CreateResponse(HttpStatusCode.OK);
         await response.WriteStringAsync(refreshToken);

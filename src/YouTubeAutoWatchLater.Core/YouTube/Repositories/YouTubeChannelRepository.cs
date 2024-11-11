@@ -1,18 +1,18 @@
-﻿using Google.Apis.YouTube.v3;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
+using YouTubeAutoWatchLater.Core.YouTube.Services;
 
 namespace YouTubeAutoWatchLater.Core.YouTube.Repositories;
 
 internal sealed class YouTubeChannelRepository : IChannelRepository
 {
-    private readonly YouTubeService _youTubeService;
+    private readonly IYouTubeApi _youTubeApi;
     private readonly ILogger<YouTubeChannelRepository> _logger;
 
-    public YouTubeChannelRepository(YouTubeService youTubeService, ILogger<YouTubeChannelRepository> logger)
+    public YouTubeChannelRepository(IYouTubeApi youTubeApi, ILogger<YouTubeChannelRepository> logger)
     {
-        _youTubeService = youTubeService;
+        _youTubeApi = youTubeApi;
         _logger = logger;
     }
 
@@ -24,15 +24,10 @@ internal sealed class YouTubeChannelRepository : IChannelRepository
         var chunks = channelIds.Chunk(Consts.MaxResults).ToArray();
         for (var i = 0; i < chunks.Length; i++)
         {
-            var chunkedChannelIds = chunks[i];
-
             _logger.LogInformation("Getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
                 i + 1, chunks.Length);
 
-            var channelsListRequest = _youTubeService.Channels.List("contentDetails");
-            channelsListRequest.Id = chunkedChannelIds.Select(id => id.Value).ToArray();
-            channelsListRequest.MaxResults = chunkedChannelIds.Length;
-            var channelListResponse = await channelsListRequest.ExecuteAsync();
+            var channelListResponse = await _youTubeApi.GetChannelsAsync(chunks[i]);
 
             _logger.LogInformation("Finished getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
                 i + 1, chunks.Length);

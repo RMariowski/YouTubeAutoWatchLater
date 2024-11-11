@@ -8,7 +8,7 @@
         "DeleteAutoAddedVideos:Cron": "0 12 * * * *",
         "DeleteAutoAddedVideos:OlderThanDays": 20,
         "DeletePrivatePlaylistItems:Cron": "0 12 * * * *",
-        "Google:RefreshToken": "",
+        "Google:RefreshTokens:0": "",
         "YouTube:PlaylistId": "",
         "YouTube:PlaylistRules:0:Channels": "ChannelName1,ChannelName2",
         "YouTube:PlaylistRules:0:PlaylistId": "",

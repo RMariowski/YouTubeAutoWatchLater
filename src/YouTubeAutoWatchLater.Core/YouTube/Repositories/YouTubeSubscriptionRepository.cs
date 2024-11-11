@@ -1,16 +1,16 @@
-﻿using Google.Apis.YouTube.v3;
-using YouTubeAutoWatchLater.Core.Models;
+﻿using YouTubeAutoWatchLater.Core.Models;
 using YouTubeAutoWatchLater.Core.Repositories;
+using YouTubeAutoWatchLater.Core.YouTube.Services;
 
 namespace YouTubeAutoWatchLater.Core.YouTube.Repositories;
 
 internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
 {
-    private readonly YouTubeService _youTubeService;
+    private readonly IYouTubeApi _youTubeApi;
 
-    public YouTubeSubscriptionRepository(YouTubeService youTubeService)
+    public YouTubeSubscriptionRepository(IYouTubeApi youTubeApi)
     {
-        _youTubeService = youTubeService;
+        _youTubeApi = youTubeApi;
     }
     
     public async Task<Subscriptions> GetMySubscriptionsAsync()
@@ -20,11 +20,7 @@ internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
         var pageToken = string.Empty;
         do
         {
-            var subscriptionsListRequest = _youTubeService.Subscriptions.List("snippet");
-            subscriptionsListRequest.MaxResults = Consts.MaxResults;
-            subscriptionsListRequest.Mine = true;
-            subscriptionsListRequest.PageToken = pageToken;
-            var subscriptionsListResponse = await subscriptionsListRequest.ExecuteAsync();
+            var subscriptionsListResponse = await _youTubeApi.GetSubscriptionsAsync(pageToken);
 
             var subscriptions = subscriptionsListResponse.Items
                 .Select(subscription => new Channel
