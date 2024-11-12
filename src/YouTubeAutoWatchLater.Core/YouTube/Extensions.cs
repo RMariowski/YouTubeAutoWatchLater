@@ -1,8 +1,5 @@
-﻿using Google.Apis.YouTube.v3;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using YouTubeAutoWatchLater.Core.Google;
 using YouTubeAutoWatchLater.Core.Handlers;
 using YouTubeAutoWatchLater.Core.YouTube.Repositories;
 using YouTubeAutoWatchLater.Core.YouTube.Services;

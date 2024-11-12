@@ -36,17 +36,16 @@ internal sealed class YouTubeApi : IYouTubeApi
     {
         _googleApi = googleApi;
         _logger = logger;
+        _youTubeServices = CreateYouTubeService();
+        _currentServiceIndex = 0;
 
         _retryPolicy = Policy
             .Handle<GoogleApiException>(ex => ex.HttpStatusCode == HttpStatusCode.Forbidden && ex.Error.Code == 403)
-            .RetryAsync(1, onRetry: (_, _) =>
+            .RetryAsync(_youTubeServices.Length - 1, onRetry: (_, _) =>
             {
                 _logger.LogWarning("Quota limit reached for current service, switching to next service.");
                 SwitchService();
             });
-
-        _youTubeServices = CreateYouTubeService();
-        _currentServiceIndex = 0;
     }
 
     public async Task<ChannelListResponse> GetChannelsAsync(ChannelId[] channelIds)
