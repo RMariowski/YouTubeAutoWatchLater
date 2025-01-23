@@ -13,7 +13,7 @@ internal class Program
     private static async Task Main()
     {
         var host = new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults()
+            .ConfigureFunctionsWebApplication()
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddApplicationInsightsTelemetryWorkerService();
