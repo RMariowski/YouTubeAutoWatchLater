@@ -5,7 +5,7 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure.Repositories;
 
-public sealed class ConfigurationTableStorageRepository : IConfigurationRepository
+internal sealed class ConfigurationTableStorageRepository : IConfigurationRepository
 {
     private const string TableName = "Configurations";
     private const string ValuePropKey = "Value";

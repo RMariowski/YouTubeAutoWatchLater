@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using YouTubeAutoWatchLater.Core.Handlers;
@@ -15,15 +15,12 @@ public sealed class GetRefreshTokenFunction
     }
 
     [Function(nameof(GetRefreshToken))]
-    public async Task<HttpResponseData> GetRefreshToken(
+    public async Task<IResult> GetRefreshToken(
         [HttpTrigger(AuthorizationLevel.Function, "get")]
         HttpRequestData request)
     {
         var parsed = int.TryParse(request.Query.Get("index"), out var refreshTokenIdx);
         var refreshToken = await _handler.HandleAsync(parsed ? refreshTokenIdx : 0);
-
-        var response = request.CreateResponse(HttpStatusCode.OK);
-        await response.WriteStringAsync(refreshToken);
-        return response;
+        return Results.Ok(refreshToken);
     }
 }

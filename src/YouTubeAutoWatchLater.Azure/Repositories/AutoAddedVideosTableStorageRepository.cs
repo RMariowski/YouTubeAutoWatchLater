@@ -5,7 +5,7 @@ using YouTubeAutoWatchLater.Core.Repositories;
 
 namespace YouTubeAutoWatchLater.Azure.Repositories;
 
-public sealed class AutoAddedVideosTableStorageRepository : IAutoAddedVideosRepository
+internal sealed class AutoAddedVideosTableStorageRepository : IAutoAddedVideosRepository
 {
     private const string TableName = "AutoAddedVideos";
 
