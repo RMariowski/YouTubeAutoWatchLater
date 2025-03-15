@@ -1,37 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <AzureFunctionsVersion>V4</AzureFunctionsVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
+
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Azure.Data.Tables" Version="12.10.0" />
-        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.1" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.1" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Azure.Data.Tables" Version="12.10.0"/>
+        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0"/>
+        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0"/>
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0"/>
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.1"/>
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.1"/>
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1"/>
     </ItemGroup>
+
     <ItemGroup>
         <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
     </ItemGroup>
+
     <ItemGroup>
         <None Update="host.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="local.settings.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
         <None Update="client_secrets*.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
     <ItemGroup>
-      <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj" />
+        <ProjectReference Include="..\YouTubeAutoWatchLater.Core\YouTubeAutoWatchLater.Core.csproj"/>
     </ItemGroup>
 </Project>
