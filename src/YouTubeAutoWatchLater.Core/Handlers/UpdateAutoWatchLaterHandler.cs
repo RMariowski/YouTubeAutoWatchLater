@@ -56,7 +56,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
     {
         _logger.LogInformation("Getting subscriptions");
         var subscriptions = await _subscriptionRepository.GetMySubscriptionsAsync();
-        _logger.LogInformation("Finished getting subscriptions");
+        _logger.LogDebug("Finished getting subscriptions");
 
         _logger.LogInformation("Setting uploads playlist for subscriptions");
 
@@ -68,7 +68,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
             subscriptions[uploadsPlaylist.Key].UploadsPlaylist = uploadsPlaylist.Value;
         }
 
-        _logger.LogInformation("Finished setting uploads playlist for subscriptions");
+        _logger.LogDebug("Finished setting uploads playlist for subscriptions");
 
         return subscriptions;
     }
@@ -82,13 +82,13 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
         ParallelOptions options = new() { MaxDegreeOfParallelism = 10 };
         await Parallel.ForEachAsync(subscriptions.Values, options, async (channel, _) =>
         {
-            _logger.LogInformation("Getting videos auto added for last month of {Channel}", channel);
+            _logger.LogDebug("Getting videos auto added for last month of {Channel}", channel);
             var videosAutoAdded = await _autoAddedVideosRepository.GetAutoAddedVideosAsync(channel.Id);
-            _logger.LogInformation("Finished getting videos auto added for last month of {Channel}", channel);
+            _logger.LogDebug("Finished getting videos auto added for last month of {Channel}", channel);
 
-            _logger.LogInformation("Getting uploads playlist items of {Channel}", channel);
+            _logger.LogDebug("Getting uploads playlist items of {Channel}", channel);
             var videosSinceDateTime = await _playlistItemRepository.GetVideosAsync(channel.UploadsPlaylist!, dateTime);
-            _logger.LogInformation("Finished getting uploads playlist items of {Channel}", channel);
+            _logger.LogDebug("Finished getting uploads playlist items of {Channel}", channel);
 
             var videosToAdd = videosSinceDateTime
                 .Where(video => videosAutoAdded.Contains(video.Id) is false)
@@ -96,7 +96,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
             newVideos.TryAdd(channel.Id, videosToAdd);
         });
 
-        _logger.LogInformation("Finished setting recent videos of subscriptions");
+        _logger.LogDebug("Finished setting recent videos of subscriptions");
 
         return newVideos;
     }
@@ -119,14 +119,14 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
 
                 try
                 {
-                    _logger.LogInformation("Adding {Video} to playlist {PlaylistId}", video, playlistId);
+                    _logger.LogDebug("Adding {Video} to playlist {PlaylistId}", video, playlistId);
                     await _playlistItemRepository.AddToPlaylistAsync(playlistId, video);
-                    _logger.LogInformation("Finished adding video {Video} to playlist {PlaylistId}",
+                    _logger.LogDebug("Finished adding video {Video} to playlist {PlaylistId}",
                         video, playlistId);
 
-                    _logger.LogInformation("Adding auto added videos of channel {ChannelId}", channelId);
+                    _logger.LogDebug("Adding auto added videos of channel {ChannelId}", channelId);
                     await _autoAddedVideosRepository.AddAsync(channelId, video);
-                    _logger.LogInformation("Finished adding auto added videos of channel {ChannelId}", channelId);
+                    _logger.LogDebug("Finished adding auto added videos of channel {ChannelId}", channelId);
                 }
                 catch (GoogleApiException googleApiException)
                     when (googleApiException.HttpStatusCode == HttpStatusCode.Conflict)
@@ -137,13 +137,13 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
             }
         }
 
-        _logger.LogInformation("Finished adding recent videos");
+        _logger.LogDebug("Finished adding recent videos");
     }
 
     private async Task SetLastSuccessfulExecutionDateTimeToNowAsync()
     {
         _logger.LogInformation("Setting last successful execution date time");
         await _configurationRepository.SetLastSuccessfulExecutionDateTimeToNowAsync();
-        _logger.LogInformation("Finished setting last successful execution date time");
+        _logger.LogDebug("Finished setting last successful execution date time");
     }
 }

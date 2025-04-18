@@ -112,9 +112,9 @@ internal sealed class YouTubeApi : IYouTubeApi
 
     private YouTubeService[] CreateYouTubeService()
     {
-        _logger.LogInformation("Creating YouTube Services");
+        _logger.LogDebug("Creating YouTube Services");
         var youTubeServices = _googleApi.CreateYouTubeServices();
-        _logger.LogInformation("Finished creating YouTube Services");
+        _logger.LogDebug("Finished creating YouTube Services");
 
         return youTubeServices;
     }

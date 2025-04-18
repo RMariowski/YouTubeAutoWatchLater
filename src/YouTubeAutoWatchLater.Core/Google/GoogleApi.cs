@@ -37,9 +37,9 @@ internal sealed class GoogleApi : IGoogleApi
         List<YouTubeService> services = new(_options.RefreshTokens.Length);
         for (var idx = 0; idx < _options.RefreshTokens.Length; idx++)
         {
-            _logger.LogInformation("Getting access token");
+            _logger.LogDebug("Getting access token");
             var accessToken = GetAccessTokenAsync(idx).GetAwaiter().GetResult();
-            _logger.LogInformation("Finished getting access token");
+            _logger.LogDebug("Finished getting access token");
 
             BaseClientService.Initializer initializer = new()
             {
@@ -66,9 +66,9 @@ internal sealed class GoogleApi : IGoogleApi
             ])
         };
 
-        _logger.LogInformation("Sending request for getting access token");
+        _logger.LogDebug("Sending request for getting access token");
         var response = await _httpClientFactory.CreateClient().SendAsync(refreshMessage);
-        _logger.LogInformation("Finished sending request for getting access token");
+        _logger.LogDebug("Finished sending request for getting access token");
 
         if (response.IsSuccessStatusCode is false)
         {
@@ -91,13 +91,13 @@ internal sealed class GoogleApi : IGoogleApi
         var clientSecretsFileName = $"client_secrets_{refreshTokenIdx}.json";
         var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var clientSecretsFilePath = Path.Combine(binDirectory, clientSecretsFileName);
-        _logger.LogInformation("Created path: {ClientSecretsFilePath}", clientSecretsFilePath);
+        _logger.LogDebug("Created path: {ClientSecretsFilePath}", clientSecretsFilePath);
 
-        _logger.LogInformation("Reading {ClientSecretsFilePath} file", clientSecretsFilePath);
+        _logger.LogDebug("Reading {ClientSecretsFilePath} file", clientSecretsFilePath);
         var googleClientSecrets = GoogleClientSecrets.FromFile(clientSecretsFilePath);
         if (googleClientSecrets is null)
             throw new ApplicationException($"{clientSecretsFilePath} file not found");
-        _logger.LogInformation("Finished reading {ClientSecretsFilePath} file", clientSecretsFilePath);
+        _logger.LogDebug("Finished reading {ClientSecretsFilePath} file", clientSecretsFilePath);
 
         return googleClientSecrets;
     }

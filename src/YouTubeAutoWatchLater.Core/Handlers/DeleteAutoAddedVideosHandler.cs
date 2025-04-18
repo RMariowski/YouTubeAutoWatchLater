@@ -34,6 +34,6 @@ internal sealed class DeleteAutoAddedVideosHandler : IDeleteAutoAddedVideosHandl
 
         _logger.LogInformation("Deleting auto added videos older than {DateTime}", formattedDateTime);
         await _autoAddedVideosRepository.DeleteOlderThanAsync(dateTime);
-        _logger.LogInformation("Finished deleting auto added videos older than {DateTime}", formattedDateTime);
+        _logger.LogDebug("Finished deleting auto added videos older than {DateTime}", formattedDateTime);
     }
 }

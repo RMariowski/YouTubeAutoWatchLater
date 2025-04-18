@@ -36,7 +36,7 @@ internal sealed class DeletePrivatePlaylistItemsHandler : IDeletePrivatePlaylist
         {
             var playlistItems = await _playlistItemRepository.GetPrivatePlaylistItemsOfPlaylistAsync(playlistId);
             var playlistItemIds = playlistItems.Select(playlistItem => playlistItem.Id).ToHashSet();
-            _logger.LogInformation("{Count} playlist items are marked as private", playlistItemIds.Count);
+            _logger.LogDebug("{Count} playlist items are marked as private", playlistItemIds.Count);
 
             foreach (var playlistItemId in playlistItemIds)
                 await _playlistItemRepository.DeletePlaylistItemAsync(playlistItemId);
