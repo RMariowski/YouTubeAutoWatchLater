@@ -106,7 +106,7 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
       http20Enabled: true
-      netFrameworkVersion: 'v8.0'
+      netFrameworkVersion: 'v9.0'
     }
     httpsOnly: true
   }
