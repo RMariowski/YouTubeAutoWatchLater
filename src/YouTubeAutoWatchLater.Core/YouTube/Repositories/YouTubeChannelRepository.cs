@@ -29,7 +29,7 @@ internal sealed class YouTubeChannelRepository : IChannelRepository
 
             var channelListResponse = await _youTubeApi.GetChannelsAsync(chunks[i]);
 
-            _logger.LogInformation("Finished getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
+            _logger.LogDebug("Finished getting channels of subscriptions chunk {CurrentChunk}/{Chunks}", 
                 i + 1, chunks.Length);
 
             foreach (var channel in channelListResponse.Items)

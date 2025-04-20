@@ -128,10 +128,11 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
                     await _autoAddedVideosRepository.AddAsync(channelId, video);
                     _logger.LogDebug("Finished adding auto added videos of channel {ChannelId}", channelId);
                 }
-                catch (GoogleApiException googleApiException)
-                    when (googleApiException.HttpStatusCode == HttpStatusCode.Conflict)
+                catch (GoogleApiException exception)
+                    when (exception.HttpStatusCode == HttpStatusCode.Conflict || 
+                          exception.Message.Contains("Parameter validation failed"))
                 {
-                    _logger.LogError(googleApiException, "Unable to add video {Video} to playlist {PlaylistId}",
+                    _logger.LogError(exception, "Unable to add video {Video} to playlist {PlaylistId}",
                         video, playlistId);
                 }
             }
