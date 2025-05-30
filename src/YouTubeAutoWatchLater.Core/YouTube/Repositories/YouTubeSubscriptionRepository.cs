@@ -12,7 +12,7 @@ internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
     {
         _youTubeApi = youTubeApi;
     }
-    
+
     public async Task<Subscriptions> GetMySubscriptionsAsync()
     {
         Subscriptions youTubeSubscriptions = new();
@@ -29,8 +29,9 @@ internal sealed class YouTubeSubscriptionRepository : ISubscriptionRepository
                     subscription.Snippet.Title
                 ))
                 .ToArray();
+
             foreach (var subscription in subscriptions)
-                youTubeSubscriptions.Add(subscription.Id, subscription);
+                _ = youTubeSubscriptions.TryAdd(subscription.Id, subscription);
 
             pageToken = subscriptionsListResponse.NextPageToken;
         } while (!string.IsNullOrEmpty(pageToken));
