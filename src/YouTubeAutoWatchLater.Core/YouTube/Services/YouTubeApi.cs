@@ -5,6 +5,7 @@ using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
+using Polly.Wrap;
 using YouTubeAutoWatchLater.Core.Google;
 using YouTubeAutoWatchLater.Core.Models;
 using YouTubePlaylistItem = Google.Apis.YouTube.v3.Data.PlaylistItem;
@@ -28,7 +29,7 @@ internal sealed class YouTubeApi : IYouTubeApi
 {
     private readonly IGoogleApi _googleApi;
     private readonly ILogger<YouTubeApi> _logger;
-    private readonly AsyncRetryPolicy _retryPolicy;
+    private readonly AsyncPolicyWrap _retryPolicy;
     private readonly YouTubeService[] _youTubeServices;
     private int _currentServiceIndex;
 
@@ -39,13 +40,19 @@ internal sealed class YouTubeApi : IYouTubeApi
         _youTubeServices = CreateYouTubeService();
         _currentServiceIndex = 0;
 
-        _retryPolicy = Policy
+        var quotaPolicy = Policy
             .Handle<GoogleApiException>(ex => ex.HttpStatusCode == HttpStatusCode.Forbidden && ex.Error.Code == 403)
             .RetryAsync(_youTubeServices.Length - 1, onRetry: (_, _) =>
             {
                 _logger.LogWarning("Quota limit reached for current service, switching to next service.");
                 SwitchService();
             });
+
+        var serverErrorPolicy = Policy
+            .Handle<GoogleApiException>(ex => ex.HttpStatusCode == HttpStatusCode.InternalServerError && ex.Error.Code == 500)
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+        _retryPolicy = Policy.WrapAsync(serverErrorPolicy, quotaPolicy);
     }
 
     public async Task<ChannelListResponse> GetChannelsAsync(ChannelId[] channelIds)
