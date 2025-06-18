@@ -133,8 +133,7 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
                           exception.Message.Contains("Parameter validation failed") ||
                           exception.HttpStatusCode == HttpStatusCode.InternalServerError)
                 {
-                    _logger.LogError(exception, "Unable to add video {Video} to playlist {PlaylistId}",
-                        video, playlistId);
+                    _logger.LogError("Unable to add video {Video} to playlist {PlaylistId}", video, playlistId);
                 }
             }
         }
