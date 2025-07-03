@@ -45,8 +45,8 @@ internal sealed class UpdateAutoWatchLaterHandler : IUpdateAutoWatchLaterHandler
     {
         var subscriptions = await GetSubscriptionsAsync();
 
-        var dateTime = DateTimeOffset.UtcNow.AddDays(-20);
-        var videosToAdd = await GetNewVideosOfSubscriptionsAsync(subscriptions, dateTime);
+        var takeSubscriptionVideosFrom = await _configurationRepository.GetSubscriptionVideosFrom();
+        var videosToAdd = await GetNewVideosOfSubscriptionsAsync(subscriptions, takeSubscriptionVideosFrom);
         await AddNewVideosToSubscriptionsPlaylistsAsync(videosToAdd);
 
         await SetLastSuccessfulExecutionDateTimeToNowAsync();

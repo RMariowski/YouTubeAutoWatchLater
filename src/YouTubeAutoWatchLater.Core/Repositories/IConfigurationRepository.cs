@@ -5,4 +5,6 @@ public interface IConfigurationRepository
     Task<DateTime> GetLastSuccessfulExecutionDateTimeAsync();
 
     Task SetLastSuccessfulExecutionDateTimeToNowAsync();
+
+    Task<DateTimeOffset> GetSubscriptionVideosFrom();
 }
